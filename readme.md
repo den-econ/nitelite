@@ -1,6 +1,6 @@
 ## About this repo
 
-This is a repo for Tim and I's night light paper. The paper uses night light data to forecast quarterly GDP growth in Indonesia.
+This is a repo for Tim and I's night light paper. The paper uses night light data to forecast quarterly GDP growth in Indonesia. Check out the appendix for full national level replication. The main source doc is nitelite_paper2.qmd.
 
 ## Cite
 
@@ -22,3 +22,4 @@ light index},
   number = {3}
 }
 ```
+
