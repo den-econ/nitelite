@@ -12,21 +12,18 @@ This is a repo for Tim, Meizahra and Krisna's night light paper. The paper uses 
 If this paper is useful for you in anyway please cite as so
 
 ```
-Gupta, Krisna, Timothy Ginting and Meizahra Afidatie. (2026). Forecasting Indonesian economic growth using night light. DEN Working Paper No.3.
+Gupta, Krisna, Timothy Ginting, and Meizahra Afidatie. 2026. "Forecasting Indonesian Economic Growth Using Night Light." DEN Working Paper No. 3.
 ```
 If you are bibtex user, please use this
 
 ```bibtex
-@techreport{gupta2026,
+@article{gupta2026,
   author = {Gupta, Krisna and Ginting, Timothy and Afidatie, Meizahra},
   title = {Forecasting Indonesian National and Provincial GDP using nighttime
 light index},
   institution = {DEN},
   year = {2026},
-  type = {Working Paper},
+  journal = {DEN Working Paper},
   number = {3}
 }
 ```
-
-
-
