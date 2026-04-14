@@ -11,7 +11,7 @@
 % Conference (for proceedings/poster)
 
 % Dates
-\published{9 February 2026}
+\published{14 April 2026}
 
 % Editor and reviewers
 
@@ -34,6 +34,9 @@ nighttime light index}
 
 % Keywords
 \keywords{Night Light; Growth Forecasting; BPS}
+
+% JEL classification codes
+\jel{C22, E37, O47, O53}
 
 % Abbreviations
 
@@ -172,26 +175,37 @@ nighttime light index}
 \begin{document}
 
 \begin{abstract}
-Economic growth is a central macroeconomic indicator that shapes the
-decisions of both governments and private enterprises. Therefore,
-tracking economic growth in higher frequency would benefit decision
-makers. One way to verify the official growth number is to use relevant
-leading indicators for economic growth that are independent from the
-statistical agency. In this paper, we use the Indonesian nighttime light
-index sourced from Blackmarble to fit historical GDP of Indonesia. Two
-forms of analysis are conducted: national-level using Autoregressive
-Distributed Lag (ARDL) and provincial level using panel data regression.
-The nighttime light index shows a consistent significant correlation to
-GDP growth across various specifications. However, the magnitude of the
-correlation is small, suggesting that nighttime light index alone cannot
-capture the full variation of GDP growth. We also find indicative
-evidence that the scarring effect post COVID-19 pandemic hurts long term
-economic growth by 2\%. The ARDL specification with scarring effect show
-the best forecasting fit and is reasonably able to forecast GDP growth
-out-of-sample.
+Economic growth is a central macroeconomic indicator that guides
+decisions of both governments and private enterprises, yet official GDP
+figures are released with substantial lag and may be subject to
+incentive-driven bias. This paper evaluates whether nighttime light
+(NTL) radiance, sourced from NASA's Black Marble VIIRS product, can
+serve as an independent leading indicator for Indonesian GDP at
+quarterly frequency. Monthly radiance rasters from 2012 to 2024 are
+aggregated into quarterly year-on-year indices and matched to real GDP
+from BPS at both the national and provincial levels. At the national
+level, we estimate OLS and Autoregressive Distributed Lag (ARDL)
+specifications with alternative treatments of the COVID-19 period,
+including transitory COVID dummies and a permanent post-2020 scarring
+dummy. At the provincial level, we exploit fix-effects and dynamic panel
+estimators (DFE, Mean Group, and Pooled Mean Group). Across
+specifications, the NTL index enters with a positive and generally
+significant coefficient, though its estimated elasticity is small and
+sensitive to how the post-2020 period is modeled. The forecast
+performance of our preferred ARDL model is in fact driven mostly by
+lagged GDP and the post-2020 dummy, with NTL contributing only
+marginally on top of these. Nighttime light alone therefore cannot fully
+account for GDP variation and is best understood as a complement to,
+rather than a substitute for, official statistics. We further find
+suggestive evidence of a post-pandemic scarring effect, though its
+estimated magnitude is sensitive to how the post-2020 regime is
+parameterized and should be read as indicative rather than precise. The
+ARDL model that incorporates the scarring term delivers the best
+in-sample fit and yields reasonable out-of-sample forecasts, supporting
+NTL as a useful nowcasting tool for Indonesian growth.
 \end{abstract}
 
-\begin{tcolorbox}[enhanced jigsaw, opacitybacktitle=0.6, titlerule=0mm, bottomrule=.15mm, colback=white, leftrule=.75mm, left=2mm, rightrule=.15mm, opacityback=0, coltitle=black, toprule=.15mm, bottomtitle=1mm, breakable, colframe=quarto-callout-note-color-frame, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Note}, toptitle=1mm, arc=.35mm, colbacktitle=quarto-callout-note-color!10!white]
+\begin{tcolorbox}[enhanced jigsaw, colframe=quarto-callout-note-color-frame, rightrule=.15mm, leftrule=.75mm, breakable, toprule=.15mm, colbacktitle=quarto-callout-note-color!10!white, bottomtitle=1mm, opacitybacktitle=0.6, left=2mm, toptitle=1mm, titlerule=0mm, arc=.35mm, title=\textcolor{quarto-callout-note-color}{\faInfo}\hspace{0.5em}{Note}, bottomrule=.15mm, colback=white, opacityback=0, coltitle=black]
 
 DEN Working Papers describe research in progress by the author(s) and
 are published to elicit comments and to encourage debate. The views
@@ -232,26 +246,50 @@ are associated with statistical agencies. The independence from
 statistical agencies is an important condition that positions nighttime
 lights well as a leading indicator for GDP growth (Enders 2014).
 
-In this paper, we utilize a raster of monthly nighttime lights data from
-Indonesia provided by NASA's Black Marble project (Stefanini Vicente and
-Marty 2023). We then average the data into quarterly, mirroring the GDP
-data from BPS. We then fit nighttime lights index on real GDP growth
-using OLS and Autoregressive Distributed Lag (ARDL) models. The ARDL
-model showed the most promising fit. Importantly, we find evidence of a
-potential structural break post COVID-19. Additionally, we provide a
-provincial analysis to provide cross-sectional variance. We utilise OLS,
-provincial fixed effect and two-way fixed effect regression.
+In this paper, we utilize monthly nighttime lights rasters for Indonesia
+from NASA's Black Marble project (Stefanini Vicente and Marty 2023)
+covering January 2012 to December 2024. The radiance values are
+extracted at the national and provincial levels, aggregated into
+quarterly averages, and transformed into year-on-year log growth rates
+to mirror the real GDP series published by BPS (BPS 2025). At the
+national level, we fit the nighttime light index on real GDP growth
+using ECM, VAR, and Autoregressive Distributed Lag (ARDL) framework with
+lag orders selected by AIC. We estimate six ARDL variants that add
+transitory COVID-19 dummies, a post-2020 dummy intended to capture a
+possible scarring effect, and quarterly seasonal dummies in order to
+test the robustness of the NTLI--GDP relationship to alternative
+treatments of the pandemic shock. At the provincial level, we exploit
+cross-sectional variation using pooled panel fixed-effects and,
+following Mahraddika (2019), dynamic panel estimators (Pesaran and Smith
+1995; Pesaran, Shin, and Smith 1999) which let us separate short-run
+dynamics from the long-run equilibrium relationship. Importantly, we
+find evidence of a potential structural break post COVID-19, and the
+ARDL specification with a scarring term delivers the best in-sample fit
+and reasonable out-of-sample forecasts.
 
-This paper aims to test whether nighttime light can be a sole predictor
-of GDP without adding other variables. We find that nighttime light
-index provides a consistent significant correlation to GDP growth across
-various specifications. However, the magnitude of the correlation is
-small, suggesting that nighttime light index alone cannot capture the
-full variation of GDP growth. However, We also find indicative evidence
-that the scarring effect post COVID-19 pandemic (Pangestu and Armstrong
-2025) hurts long term economic growth by 2\%. The ARDL specification
-with scarring effect show the best forecasting fit and is reasonably
-able to forecast GDP growth out-of-sample.
+This paper aims to test whether nighttime light alone can serve as a
+credible proxy for Indonesian GDP growth. Across national and provincial
+specifications, we find that the nighttime light index generally
+provides a positive correlation with GDP growth. However, the estimated
+elasticity is small and sensitive to how the COVID-19 shock is modeled,
+indicating that nighttime light on its own cannot fully capture GDP
+variation. Inspecting the ARDL more carefully, the bulk of the forecast
+fit comes from lagged GDP and the post-2020 dummy: the NTL coefficient
+is at most marginally significant in the preferred specification. The
+NTLI, thus, should be read as a complementary input to nowcasting models
+rather than a stand-alone indicator. We also document suggestive
+evidence of a scarring effect post-pandemic (Pangestu and Armstrong
+2025). The point estimate is consistent with a modest reduction in
+long-run growth, but we caution against reading the magnitude too
+literally: it is sensitive to the model's ARDL dynamics and is
+identified from a relatively short post-shock window. Among the
+specifications we consider, the ARDL model augmented with the scarring
+term delivers the best in-sample fit as well as the most accurate
+out-of-sample forecasts, suggesting that properly accounting for the
+structural break is essential for using nighttime lights to validate or
+nowcast official growth figures. The provincial panel results broadly
+corroborate the national findings, lending cross-sectional support to
+the NTLI--GDP link even after allowing for provincial heterogeneity
 
 The paper is organised as follows. We discuss the nighttime lights data
 collection process and exploratory data analysis section two. The
@@ -411,6 +449,23 @@ autocorrelation in the residual with two time series data. We then use
 ARDL to take into account the autocorrelation (Enders 2014). We use lags
 determined by AIC.
 
+Augmented Dickey--Fuller tests (reported in the appendix) cannot reject
+a unit root in log GDP (\(p = 0.91\)) or log NTL (\(p > 0.99\)) at
+conventional levels, while their first differences are stationary at the
+5 and 10 percent levels respectively, consistent with both series being
+I(1). The two cointegration tests we run disagree: the Engle--Granger
+residual test on the OLS above rejects the null of no cointegration
+decisively (\(p = 0.0003\)), while the Johansen trace test fails to
+reject rank zero (\(\text{trace} = 9.45\) versus a 5 percent critical
+value of \(15.49\)). With only \(T = 51\) quarterly observations and
+only two variables, the Johansen test has limited power, but the
+cointegration evidence is at best borderline rather than decisive, and
+we treat the long-run relationship with appropriate caution. The
+ARDL-in-levels approach we adopt is well-defined under the
+Pesaran--Shin--Smith bounds framework regardless of whether the series
+are individually I(0) or I(1); a formal bounds test is left for future
+work.
+
 \[
 g_t=\beta_0+\sum_{p=1}^{P}\beta_i g_{t-i}+\sum_{q=0}^{Q}\beta_j ntli_{t-j}+\epsilon_t
 \]
@@ -428,7 +483,8 @@ distributed lag techniques to account for the dynamic nature of the
 relationship between nighttime lights and regional GDP as in the
 national level. Namely, we follow the approach of Mahraddika (2019) by
 using Dynamic Fixed Effects (DFE), Mean Group (MG) and Pooled Mean Group
-(PMG) estimators Pesaran, Shin, and Smith (1999).
+(PMG) estimators (Pesaran and Smith 1995; Pesaran, Shin, and Smith
+1999).
 
 \section{Estimation Results}\label{estimation-results}
 
@@ -644,10 +700,33 @@ scarring dummy, the nighttime light coefficient at time 0 is only
 significant in 10\% with or without quarterly dummies.
 
 Indeed, the past GDP values are more important, with the AR1 coefficient
-is -0.7 and is significant at 0.1\% level. More importantly, scarring
-effect shows a 0.1\% level significance at all 4 lags. Scarring dummy at
-time 0 has a coefficient of -0.02, suggestiong about 2\% lower in GDP
-level persistently after the pandemic.
+is -0.7 and is significant at 0.1\% level. More importantly, the
+scarring effect shows a 0.1\% level significance at all 4 lags. The
+scarring dummy at time 0 has a coefficient of -0.02, which, taken at
+face value, would suggest a GDP level roughly 2 percent lower after the
+pandemic. This magnitude should be interpreted with caution, however:
+the scarring specification also alters the AR dynamics of the ARDL
+substantially (the sum of autoregressive coefficients flips sign
+relative to the other specifications), and the estimate is identified
+from only a few years of post-shock data. The coefficient is best read
+as suggestive rather than as a precise long-run penalty.
+
+To assess directly whether nighttime lights carry predictive information
+about future GDP --- the leading-indicator framing implied by our title
+--- we also run pairwise Granger-causality tests between log NTL and log
+GDP at lags 1 through 4 (full output in the appendix). The results
+temper the leading-indicator interpretation. NTL Granger-causes GDP only
+at lag 2 (\(F = 5.57\), \(p = 0.007\)); at lags 1, 3, and 4 the test
+cannot reject (\(p = 0.33\), \(0.23\), \(0.34\) respectively), so the
+predictive content is not robust across lag choices. Strikingly, the
+reverse direction is much stronger: GDP Granger-causes NTL at every lag
+from 1 through 4, with \(p\)-values between \(0.004\) and \(0.018\).
+Taken together, the bivariate Granger evidence is more consistent with
+NTL contemporaneously tracking GDP --- and possibly responding to GDP
+with a short lag --- than with NTL serving as a robust leading
+indicator. We therefore frame NTL throughout the paper as a
+contemporaneous proxy and a candidate input into multi-variable
+nowcasting models, rather than as a stand-alone leading indicator.
 
 \subsection{Regional-level analysis}\label{regional-level-analysis}
 
@@ -667,7 +746,7 @@ data provides a useful proxy for GDRP.
 
 \centering{
 
-\pandocbounded{\includegraphics[keepaspectratio]{lala/fig/scatter_ntl.png}}
+\pandocbounded{\includegraphics[keepaspectratio]{stata/fig/scatter_ntl.png}}
 
 }
 
@@ -811,14 +890,15 @@ GDP.
 To account for the possibility that the relationship between GDP and
 nighttime lights evolves dynamically rather than instantaneously, we
 extend the analysis using a Dynamic Fixed Effects (DFE), Pooled Mean
-Group (PMG) and Mean Group (MG) error-correction model Pesaran, Shin,
-and Smith (1999). Unlike the static FE and TWFE specifications, the
-distributed lag framework allows for short-run fluctuations while
-modeling a long-run equilibrium relationship between the variables.
-Specifically, it incorporates lagged adjustments so that deviations from
-the long-run relationship can gradually converge back to equilibrium. At
-the same time, the model retains fixed effects (for DFE case) to control
-for unobserved, time-invariant provincial heterogeneity.
+Group (PMG) and Mean Group (MG) error-correction model (Mahraddika 2019;
+Pesaran and Smith 1995; Pesaran, Shin, and Smith 1999). Unlike the
+static FE and TWFE specifications, the distributed lag framework allows
+for short-run fluctuations while modeling a long-run equilibrium
+relationship between the variables. Specifically, it incorporates lagged
+adjustments so that deviations from the long-run relationship can
+gradually converge back to equilibrium. At the same time, the model
+retains fixed effects (for DFE case) to control for unobserved,
+time-invariant provincial heterogeneity.
 
 The DFE results provide strong evidence of a stable long-run
 relationship between the two variables. The error-correction term is
@@ -1037,39 +1117,56 @@ it takes for regional economies to recover and stabilize after
 disruptions.
 
 Recent studies have highlighted the possibility of a hysteresis, or a
-long-lasting, potentially permanent impact of a deep crisis Reinhart and
-Rogoff (2014). When an economy face a deep crisis, it can have a lasting
-impact amid an increase of risk permia which hinders banks from lending
-to firms. This creates a feedback loop as firms are unable to invest and
-grow, corroding the economic growth potential. Indonesia's experience
-from the 1998 crisis provides a historical precedent for such hysteresis
-effects, where growth rates never really returned to pre-Asian Financial
-Crisis level.
+long-lasting, potentially permanent impact of a deep crisis (Aikman et
+al. 2022; Lucidi and Semmler 2023). When an economy face a deep crisis,
+it can have a lasting impact amid an increase of risk permia which
+hinders banks from lending to firms. This creates a feedback loop as
+firms are unable to invest and grow, corroding the economic growth
+potential. Indonesia's experience from the 1998 crisis provides a
+historical precedent for such hysteresis effects, where growth rates
+never really returned to pre-Asian Financial Crisis level.
 
-\section{Conclusion}\label{conclusion}
+It is worth emphasising that the DFE result above is not corroborated by
+the more flexible PMG and MG estimators in the same table. The long-run
+NTL coefficient is significant under DFE in both the baseline and the
+scarring specifications, marginal under PMG, and either insignificant or
+wrong-signed under MG once the scarring dummy is included. The three
+estimators differ in how much heterogeneity across provinces they allow.
+DFE is the most restrictive of the three but only consistent if the
+long-run NTL--GDP elasticity is genuinely common across all 34
+provinces, while MG is consistent under heterogeneity at the cost of
+efficiency. We argue The Indonesian provincial economy is plainly
+heterogeneous: Java's services-and-manufacturing base, Kalimantan and
+Papua's mining-driven output, and Sulawesi's largely agricultural
+structure each generate very different NTL--GDP elasticities. We
+therefore present DFE as one specification among several rather than as
+a preferred estimator, and read the cross-estimator divergence as
+informative about provincial heterogeneity in the NTL--GDP relationship.
 
-We ran national-level and regional-level regression to inspect the
-relationship between nighttime light index and GDP. Overall, we find
-that nighttime light index can be used to predict GDP growth well.
-However, there are some caveats that need to be highlighted. Analyzing
-national-level and regional-level provide us with bi-variate time series
-analysis coupled with insights from panel data regression. We find that
-the OLS results are significant, large, and provide consistent
-estimators when regional cross-sectional variation is added. However,
-OLS models provide biased estimators for both the national-level and
-regional-level analysis. Once we take into account autocorrelation (from
-the ARDL specification) and provincial bias (using fixed effects), the
-correlation strength of the nightlight index decreases.
+We are unable to causally attribute the post-2020 break to COVID
+specifically, as the scarring dummy will absorb any persistent post-2020
+shift. including BPS methodology changes, commodity-price re-pricing,
+the Omnibus Law, or other contemporaneous shocks. Interpreting the
+\(-2\) percent coefficient as a precise estimate of pandemic damage,
+therefore, must be taken with a grain of salt. Finally, the visible
+disagreement between DFE (significant) and MG (often insignificant or
+wrong-signed) long-run NTL coefficients in the provincial panel suggests
+that pooled estimates may be papering over genuine heterogeneity across
+Indonesian provinces rather than reflecting a common long-run
+relationship.
 
 There are two potential key takeaways from the national-level analysis.
-First, the scarring effect is critical for forecasting GDP, more than it
-might be for other indicators. We can see this especially when we use
-quarterly dummies. From Figure~\ref{fig-4}, The panel (c) and (f) show
-that quarterly dummies do not significantly add insight, while panel (d)
-and (e), panels with quarterly dummies without scarring, show a looser
-fit. This finding is consistent with other studies that examine the
-potential scarring effect from the COVID pandemic in Indonesia (Pangestu
-and Armstrong 2025).
+First, accounting for a post-2020 regime shift is critical for
+forecasting GDP, more than it might be for other indicators. We can see
+this especially when we use quarterly dummies. From Figure~\ref{fig-4},
+The panel (c) and (f) show that quarterly dummies do not significantly
+add insight, while panel (d) and (e), panels with quarterly dummies
+without scarring, show a looser fit. This pattern is consistent with
+other studies that discuss a potential scarring effect from the COVID
+pandemic in Indonesia (Pangestu and Armstrong 2025), though we caution
+that our scarring dummy captures any persistent post-2020 shift and does
+not, on its own, identify a specific channel or a precise long-run
+magnitude.
 
 Secondly, the nightlight index does not perform as well as we think. We
 find that that the nighttime light index fluctuates in a different way
@@ -1091,21 +1188,62 @@ electricity subsidies during hard times. The nighttime lights index is
 unable to identify situations involving a heavy downturn where the
 government decided to step in to maintain electricity consumption.
 
-The regional level analysis corroborates the national-level findings.
-That is, a potential existence of hysteresis, or the scarring effect of
-pandemic, is found in the regional-level analysis as well. The DFE base
-results confirms the literature speed of convergence, but the scarring
-effect reduces the speed of convergence even further. Additionally, the
-nightlight index also not as important as we think, as the short-term
-dynamics show weak significance.
+\section{Conclusion}\label{conclusion}
 
-Nevertheless, the ARDL model shows promise in forecasting national GDP.
-The out-of-sample forecast shows that the model can predict GDP well,
-especially when we use scarring dummies using a minimal number of
-variables. While we have demonstrate that nighttime light index cannot
-be used as a sole predictor of GDP, its consistent significance across
-various specifications suggest that nighttime light data can be
-considered to feed forecasting and nowcasting models.
+This paper has used Indonesian quarterly real GDP and Black Marble
+nighttime light radiance from 2012 to 2024 to ask, in a deliberately
+lean setting, how much economic information about Indonesia can be
+recovered from satellite light alone. We summarise our findings as a
+short list of what the analysis does, and does not, support.
+
+Nighttime light is positively and generally significantly correlated
+with GDP across OLS, ARDL, and provincial panel specifications. Once
+autocorrelation (ARDL) and provincial heterogeneity (FE/TWFE) are
+controlled for, the OLS elasticity of about 0.56 falls by an order of
+magnitude to roughly 0.05 in the within-province dimension, indicating
+that most of the raw OLS association is between-province rather than
+time-series identification. There is a clear structural break in the GDP
+series around 2020, and adding a post-2020 dummy substantially improves
+both the in-sample fit and the out-of-sample forecast accuracy of the
+ARDL.
+
+Overall, nighttime light is not a strong stand-alone predictor of GDP.
+In the preferred ARDL+Scar specification the contemporaneous NTL
+coefficient is significant only at the 10 percent level, and the bulk of
+the forecast performance comes from lagged GDP and the post-2020 dummy.
+We do not find robust Granger-causal evidence that NTL leads GDP
+either,as pattern more consistent with NTL tracking GDP
+contemporaneously than leading it. The cointegration evidence is also
+mixed: Engle--Granger residual ADF rejects the null of no cointegration
+(\(p = 0.0003\)), but the Johansen trace test fails to reject rank zero.
+
+A pattern suggestive of the scarring effect also appears in the
+provincial panel. The DFE baseline yields a speed of convergence in line
+with the literature, and adding the scarring dummy slows it further. We
+emphasize, however, that this is an associational pattern rather than a
+causally identified estimate: the dummy captures any persistent
+post-2020 level shift, and the implied adjustment dynamics should be
+interpreted with the same caution we flag at the national level.
+Additionally, the nightlight index is also not as important as we might
+think, as its short-term dynamics show weak significance.
+
+This NTL--GDP divergence during COVID is more than a curiosity, because
+it cuts against one of the original motivations for using nighttime
+lights in the first place. NTL is appealing as an independent validation
+tool precisely because it is generated outside the statistical agency
+and is therefore immune to revisions or measurement choices. While that
+independence become even more valuable during recession period, it is
+exactly during such episodes (here, the 2020 trough) that NTL departs
+most visibly from GDP. Whether the gap is driven by cloud cover and
+gap-filling, by electricity subsidies that decouple lighting from
+output, by the resilience of household-level lighting during commercial
+slowdowns, or by some combination of these channels, we cannot tell from
+the present data.
+
+On balance, our reading is that nighttime lights are a useful but
+limited input to nowcasting Indonesian growth: a credible component of a
+multi-variable forecasting model, but not a substitute for official GDP
+and not, by themselves, a reliable independent check on it.
 
 \section*{Reproducibility Statement}\label{reproducibility-statement}
 \addcontentsline{toc}{section}{Reproducibility Statement}
@@ -1129,12 +1267,6 @@ Bickenbach, Frank, Eckhardt Bode, Peter Nunnenkamp, and Mareike Söder.
 2016. {``Night Lights and Regional GDP.''} Journal Article. \emph{Review
 of World Economics} 152 (2): 425--447.
 https://doi.org/\url{https://doi.org/10.1007/s10290-016-0246-0}.
-
-\bibitem[\citeproctext]{ref-blanchard}
-Blanchard, Olivier, Eugenio Cerutti, and Lawrence Summers. 2015.
-\emph{Inflation and Activity â€`` Two Explorations and Their Monetary
-Policy Implications}. NBER Working Papers 21726. National Bureau of
-Economic Research, Inc. \url{https://doi.org/None}.
 
 \bibitem[\citeproctext]{ref-bps}
 BPS. 2025. \emph{{[}Seri 2010{]} 4. Laju Pertumbuhan PDB Menurut

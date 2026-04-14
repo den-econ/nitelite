@@ -1,0 +1,270 @@
+---
+title: "Forecasting Indonesian National and Provincial GDP using Nighttime Light Index"
+subtitle: "DEN Economic Lab working paper"
+author:
+  - name: Krisna Gupta
+    affiliations: "Dewan Ekonomi Nasional"
+  - name: Timothy Kinmekita Ginting
+    affiliations: "Dewan Ekonomi Nasional"
+  - name: Meizahra Afidatie
+    affiliations: "Dewan Ekonomi Nasional"
+date: last-modified
+date-format: "DD MMMM YYYY"
+bibliography: ../ref.bib
+csl: ../taylor-and-francis-chicago-author-date.csl
+format:
+  den-revealjs: default
+  den-beamer: default
+---
+
+## Why measure GDP at higher frequency? {.small}
+
+- GDP is the anchor variable for most macroeconomic decisions: fiscal planning, monetary policy, private investment.
+- Official quarterly numbers are released with **substantial lag** and occasional revisions.
+- When the stakes are high, policy makers often need to **nowcast** — infer the most recent quarter from leading or coincident indicators.
+- Because GDP is a political signal, there is an incentive to overestimate; *independent* validation is valuable.
+
+> **Research question.** Can nighttime lights — generated outside the statistical agency — serve as a credible proxy for Indonesian GDP growth, nationally and provincially?
+
+## Why nighttime lights?
+
+- Satellite-based measure of light emitted from Earth at night: streetlights, buildings, vehicles, commercial activity.
+- Literature: @nl, @nl2, @nl3 show NTL tracks economic activity globally, including for countries with weak statistical infrastructure.
+- **Independent of BPS.** Data pipeline from NASA's Black Marble is reproducible and transparent.
+- High spatial resolution (500 m) — allows both national and provincial analysis.
+- But: is it genuinely useful for **Indonesia**?
+
+## Data: NASA Black Marble VIIRS {.small}
+
+- Source: NASA Black Marble Standard Product Suite, via `blackmarblepy` [@blackmarblepy].
+- Daily radiance measurements, cloud-corrected and calibrated.
+- We aggregate to **monthly** (Jan 2012 – Dec 2024) then to **quarterly** year-on-year log growth.
+- GDP data from BPS quarterly real GDP series [@bps], matched by quarter.
+- Provincial GDRP from BPS for 34 provinces.
+
+::: {.notes}
+Coverage: 13 years, 51 quarterly observations at the national level, 34 × 47 ≈ 1,600 panel observations at the provincial level.
+:::
+
+## Indonesia seen from space, 2023
+
+![Annual NTL in Indonesia, 2023](../fig/nitelite.png){width=70%}
+
+- Java dominates.
+- Stark contrast between Java and the rest of Indonesia — mirrors GDP distribution.
+- Mining and palm-oil regions are visibly darker despite high economic output.
+
+## National series
+
+![Quarterly real GDP (left) and NTL index (right), 2012–2024](../fig/figQ.png){width=90%}
+
+- Both series trend upward; visually non-stationary.
+- **NTL barely dips during COVID** — a red flag we return to.
+
+## Two layers of analysis
+
+:::: {.columns}
+
+::: {.column width="50%"}
+**National level**
+
+- Bivariate time-series.
+- OLS → ARDL with lag selection by AIC.
+- Six ARDL specifications around COVID/scarring/quarterly dummies.
+- Train/test forecast (holdout = 2024+).
+:::
+
+::: {.column width="50%"}
+**Provincial level**
+
+- Panel of 34 provinces × 47 quarters.
+- Static: pooled OLS, FE, TWFE.
+- Dynamic: DFE, PMG, MG (Pesaran–Shin–Smith).
+- Tests provincial heterogeneity explicitly.
+:::
+
+::::
+
+## Are the series stationary? {.small}
+
+Augmented Dickey–Fuller tests:
+
+| Series | ADF stat | p-value | 5% critical | Verdict |
+|--------|---------:|--------:|------------:|---------|
+| log GDP, levels | −0.38 | 0.91 | −2.93 | I(1) |
+| log GDP, $\Delta$ | −2.97 | 0.04 | −2.93 | stationary |
+| log NTL, levels | +1.14 | 0.996 | −2.94 | I(1) |
+| log NTL, $\Delta$ | −2.77 | 0.06 | −2.94 | borderline stationary |
+
+Both series look I(1); first differences stationary.
+
+## Are they cointegrated? {.small}
+
+Two tests, two verdicts:
+
+- **Engle–Granger residual ADF**: reject "no cointegration" at 1% (p = 0.0003) ✓
+- **Johansen trace test**: fail to reject rank = 0 (9.45 < 15.49 at 5%) ✗
+
+With $T = 51$ and two variables, the Johansen test has low power, and the evidence is **borderline** rather than decisive.
+
+ARDL-in-levels (Pesaran–Shin–Smith bounds framework) remains valid whether the series are I(0) or I(1), so we proceed.
+
+## Does NTL *lead* GDP? Granger-causality
+
+|  | lag 1 | lag 2 | lag 3 | lag 4 |
+|--|------:|------:|------:|------:|
+| NTL → GDP (p) | 0.326 | **0.007** | 0.229 | 0.343 |
+| GDP → NTL (p) | **0.006** | **0.018** | **0.007** | **0.004** |
+
+- NTL Granger-causes GDP **only at lag 2**.
+- GDP Granger-causes NTL at **every** lag, much more robustly.
+- Pattern is more consistent with NTL *tracking* GDP contemporaneously than leading it.
+- This qualifies the leading-indicator framing.
+
+## National: OLS is biased
+
+![OLS fit and residuals](../fig/Qols.png){width=85%}
+
+- OLS coefficient: 0.54***, but residuals are systematically biased: **over-predicts pre-2017, under-predicts post-2017**.
+- Residuals are clearly autocorrelated.
+- Need a dynamic specification → ARDL.
+
+## National: six ARDL specifications
+
+![ARDL fits across six specifications](../fig/ARDLQ.png){width=80%}
+
+(a) baseline  (b) +Covid  (c) +Scarring  (d) +Quarterly  (e) +Q+C  (f) +Q+S.
+
+Specifications with the scarring dummy — panels (c) and (f) — produce the tightest fits.
+
+## Reading the ARDL table {.small}
+
+- **NTL coefficient shrinks** drastically once dynamics are added: 0.54 (OLS) → 0.01–0.08 (ARDL).
+- Contemporaneous NTL is significant at 1% in the baseline, only 10% in the preferred ARDL+Scar.
+- The scarring dummy is highly significant at all four lags.
+- Bulk of the fit comes from **lagged GDP + the post-2020 dummy**, not from NTL.
+
+::: {.small}
+> NTL carries information about GDP, but not enough to be a stand-alone predictor.
+:::
+
+## The "scarring" coefficient — handle with care
+
+- The post-2020 dummy coefficient at $t=0$ is about $-0.02$ → naively, "GDP 2% lower persistently after the pandemic."
+- **Three reasons to discount the 2% number:**
+  1. The +Scar spec flips AR coefficients' signs and magnifies the trend — model-fit artefact as much as structural finding.
+  2. The dummy absorbs *any* post-2020 shift: BPS methodology changes, commodity prices, reforms.
+  3. Identification rests on only ~20 post-shock quarters.
+- Read as **suggestive**, not a precise estimate of pandemic damage.
+
+## Out-of-sample forecast
+
+![ARDL train/test split: hold-out 2024+](../fig/ARDL_train_test_forecast.png){width=80%}
+
+- +Scar and +Q+S produce the smallest MAE/RMSE.
+- But: hold-out window is **only 4–6 quarters**. Too short to make strong forecast-quality claims.
+- Rolling/recursive evaluation is future work.
+
+## Provincial: static models {.small}
+
+| | Pooled OLS | FE | TWFE |
+|---|---:|---:|---:|
+| NTL coefficient | 0.56*** | 0.28*** | **0.055***** |
+| $R^2$ | 0.55 | 0.35 | 0.85 |
+
+- Pooled OLS: driven by **between-province** variation (Java vs rest of Indonesia).
+- Moving to within-province (FE) and time-controlled (TWFE) shrinks the coefficient by an order of magnitude.
+- **TWFE = 0.055** is the most informative: within a province, controlling for common time shocks, NTL has little marginal predictive power.
+
+## Provincial cross-section
+
+![NTL vs GDRP across 34 provinces](../stata/fig/scatter_ntl.png){width=70%}
+
+- Java clusters high on both axes.
+- Resource provinces (Kalimantan, Papua) generate output without light.
+- Agricultural provinces sit somewhere in between.
+- The NTL–GDRP *slope* plausibly differs across island groups.
+
+## Provincial: dynamic estimators {.small}
+
+| | DFE | PMG | MG |
+|---|---:|---:|---:|
+| Long-run NTL, baseline | 0.332*** | 0.374 | 0.486*** |
+| Long-run NTL, +Scarring | 0.589** | 0.426 | −0.713 |
+| Pooling: short run | common | common | free |
+| Pooling: long run | common | common | free |
+
+- DFE (strongest pooling): significant throughout.
+- PMG (long-run only pooled): insignificant in baseline.
+- MG (fully free): large and positive in baseline, **sign-flipped** in +Scarring.
+
+## What this disagreement means
+
+- FE absorbs *intercept* heterogeneity across provinces — not *slope* heterogeneity.
+- DFE/PMG impose a common NTL **slope** across all 34 provinces. MG does not.
+- When the true elasticity differs across Java / Kalimantan / Sulawesi / Papua, DFE gives a precise average that doesn't represent any particular province.
+- MG's sign-flip in +Scarring is not "the true elasticity is negative" — it's the signature of heterogeneity showing up once the pooling restriction is relaxed.
+
+::: {.small}
+> The cross-estimator disagreement is itself the finding.
+:::
+
+## What about the ECT slowdown?
+
+- Baseline DFE: ECT = $-0.0374$ → ~6.75 years to adjust.
+- +Scarring DFE: ECT = $-0.0169$ → ~14.75 years.
+- Tempting interpretation: **hysteresis** — the pandemic permanently slowed recovery.
+- But: adding a scarring dummy mechanically *redefines* equilibrium, so part of the ECT drop is a specification artefact.
+- We flag this as consistent with hysteresis, not a causal identification.
+
+## What we find
+
+- NTL is **positively and generally significantly** correlated with Indonesian GDP.
+- Most raw-OLS association is **between-province** rather than time-series: TWFE coefficient is ~0.05, not 0.56.
+- There is a clear structural break in GDP around 2020, and accounting for it materially improves forecast fit.
+- Pattern of provincial estimator disagreement points to **genuine slope heterogeneity** across islands.
+
+## What we do **not** find {.small}
+
+- Evidence that NTL is a strong **stand-alone** predictor — the ARDL forecast is driven by lagged GDP and the post-2020 dummy.
+- Robust Granger-causal evidence that NTL **leads** GDP (only lag 2 works).
+- A clean causal reading of the **2% scarring** estimate (dummy absorbs any post-2020 shock).
+- Convincing evidence that the **adjustment speed** has changed (ECT slowdown is partly a specification artefact).
+- Cross-estimator agreement in the provincial panel — pooled estimates likely paper over heterogeneity.
+
+## Takeaway
+
+NTL for Indonesia is best framed as:
+
+1. A **complement** to official GDP in nowcasting pipelines, not a substitute.
+2. A **between-province** indicator of structural variation.
+3. An **imperfect** crisis signal — NTL diverged from GDP precisely during the 2020 shock, where independent validation is most valuable.
+
+Useful, but not a magic wand.
+
+## Limitations & future work {.small}
+
+- **Sample size**: 51 quarterly observations is tight for ARDL+Scar dfs.
+- **Short OOS window**: rolling-origin forecasts needed.
+- **Formal bounds test** (Pesaran–Shin–Smith) not reported — to be added.
+- **Scarring identification**: try dummies starting 2022Q1 or 2023Q1; ECM reformulation.
+- **Provincial heterogeneity**: interact NTL with province characteristics; cluster-wise elasticity by island group.
+- **COVID-period divergence**: pair NTL with electricity dispatch, mobility, fiscal flow data.
+
+## Thank you
+
+Paper and reproducibility repo:
+
+::: {.small}
+- Main paper: [github.com/imedkrisna/nitelite](https://github.com/imedkrisna/nitelite)
+- Python pipeline (national): `appendix.ipynb`
+- Stata pipeline (provincial): `stata/Do/Nighttime Light_Reg.do`
+- Data: NASA Black Marble [@blackmarblepy], BPS [@bps]
+:::
+
+Contact: krisna@dewanekonomi.go.id
+
+## {.ending-slide background-image="end.png" background-size="cover"}
+
+::: {.ending-slide}
+:::

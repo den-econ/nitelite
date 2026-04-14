@@ -102,6 +102,7 @@
 \newif\ifcup@email
 \newif\ifcup@hyperref
 \newif\ifcup@keywords
+\newif\ifcup@jel
 \newif\ifcup@super
 \define@key{cup}{abbreviations}[true]{%
   \cup@keyval@bool{abbreviations}{#1}%
@@ -151,6 +152,9 @@
 \define@key{cup}{keywords}[true]{%
   \cup@keyval@bool{keywords}{#1}%
 }
+\define@key{cup}{jel}[true]{%
+  \cup@keyval@bool{jel}{#1}%
+}
 \define@key{cup}{super}[true]{%
   \cup@keyval@bool{super}{#1}%
 }
@@ -197,6 +201,7 @@
   copyright,
   abbreviations,
   keywords,
+  jel,
 }
 \RequirePackage{geometry}
 \RequirePackage{csquotes}
@@ -479,6 +484,11 @@
 }
 \newcommand*\@keywords{}
 \@onlypreamble\keywords
+\newcommand*\jel[1]{%
+  \gdef\@jel{#1}%
+}
+\newcommand*\@jel{}
+\@onlypreamble\jel
 \newcommand*\cup@abbreviations@print{%
   \ifx\@abbreviations\@empty\else
     {\noindent\bfseries Abbreviations: }
@@ -490,6 +500,13 @@
   \ifx\@keywords\@empty\else
     {\noindent\bfseries Keywords: }
     \@keywords
+    \par
+  \fi
+}
+\newcommand*\cup@jel@print{%
+  \ifx\@jel\@empty\else
+    {\noindent\bfseries JEL Classification: }
+    \@jel
     \par
   \fi
 }
@@ -1070,6 +1087,10 @@
   \extrasfont
   \ifcup@keywords
     \cup@keywords@print
+    %\par\vspace*{\cup@space@inter@extra}
+  \fi
+  \ifcup@jel
+    \cup@jel@print
     %\par\vspace*{\cup@space@inter@extra}
   \fi
   \ifcup@abbreviations

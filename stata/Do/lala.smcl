@@ -1,0 +1,1531 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}C:\Users\imedk\github\nitelite2\stata\Do\lala.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res}14 Apr 2026, 15:17:34
+
+{com}. do Nighttime Light_Reg.do
+{err}{p 0 4 2}
+file {bf:{err}Nighttime.do}
+not found
+{p_end}
+{txt}{search r(601), local:r(601);}
+
+{com}. do stata/Nighttime Light_Reg.do
+{err}{p 0 4 2}
+file {bf:{err}stata/Nighttime.do}
+not found
+{p_end}
+{txt}{search r(601), local:r(601);}
+
+{com}. cd
+{res}C:\Users\imedk\github\nitelite2\stata\Do
+
+{com}. do Nighttime Light_Reg
+{err}{p 0 4 2}
+file {bf:{err}Nighttime.do}
+not found
+{p_end}
+{txt}{search r(601), local:r(601);}
+
+{com}. dir
+{txt}  <dir>   4/14/26 15:17  {res}.                 
+{txt}  <dir>   4/14/26 14:42  {res}..                
+{txt}   0.2k   4/14/26 15:17  {res}lala.smcl         
+{txt}  11.2k   4/14/26 14:43  {res}Nighttime Light_Reg.do
+{txt}   2.7k   4/14/26 14:42  {res}Nighttime light_Viz.do
+
+{com}. do "Nighttime Light_Reg.do"
+{txt}
+{com}. /*==============================================================================
+> |                             Nighttime Light and GDRP                         |
+> |------------------------------------------------------------------------------|
+> |  Written by : Meizahra Afidatie                                              |
+> |  Created    : October 2025                                                   |
+> |------------------------------------------------------------------------------|
+> |  Source     :                                                                |
+> ==============================================================================*/
+. 
+. ***********
+. *DATA PATH*
+. ***********
+. 
+. gl user = c(username)
+{txt}
+{com}. *path lala (original)*
+. if "$user" == "meizahra"{c -(}
+.         gl path "/Users/meizahra/Documents/nitelite"
+.         gl folder "$path/Lala"
+.         {c )-}
+{txt}
+{com}. *path nitelite2 (migrated copy)*
+. if "$user" == "imedk"{c -(}
+.         gl folder "C:/Users/imedk/github/nitelite2/stata"
+.         {c )-}
+{txt}
+{com}. 
+. gl data         "$folder/raw"
+{txt}
+{com}. gl output       "$folder/dat"
+{txt}
+{com}. gl reg          "$folder/reg"
+{txt}
+{com}. gl do           "$folder/Do"
+{txt}
+{com}. 
+. set more off
+{txt}
+{com}. 
+. *-------------------------------------------------------------------------------
+. * Cleaning GDRP
+. *-------------------------------------------------------------------------------
+. 
+. *----- Nominal GDRP Data -----*
+. import excel "$data/PDRB Seluruh Provinsi ADHK 2010-2025.xlsx", sheet("Level") firstrow clear
+{res}{text}(66 vars, 34 obs)
+
+{com}. 
+. reshape long year_, i(prov) j(period, string)
+{res}{txt}(j = 2010_12 2010_3 2010_6 2010_9 2011_12 2011_3 2011_6 2011_9 2012_12 2012_3 2012_6 2012_9 2013_12 2013_3 2013_6 2013_9 2014_12 2014_3 2014_6 2014_9 2015_12 2015_3 2015_6 2015_9 2016_12 2016_3 2016_6 2016_9 2017_12 2017_3 2017_6 2017_9 2018_12 2018_3 2018_6 2018_9 2019_12 2019_3 2019_6 2019_9 2020_12 2020_3 2020_6 2020_9 2021_12 2021_3 2021_6 2021_9 2022_12 2022_3 2022_6 2022_9 2023_12 2023_3 2023_6 2023_9 2024_12 2024_3 2024_6 2024_9 2025_12 2025_3 2025_6 2025_9)
+
+Data{col 36}Wide{col 43}->{col 48}Long
+{hline 77}
+Number of observations     {res}          34   {txt}->   {res}2,176       
+{txt}Number of variables        {res}          66   {txt}->   {res}4           
+{txt}j variable (64 values)                    ->   {res}period
+{txt}xij variables:
+{res}year_2010_12 year_2010_3 ... year_2025_9  {txt}->   {res}year_
+{txt}{hline 77}
+
+{com}. ren year_ pdrb
+{res}{txt}
+{com}. gen year = substr(period, 1,4)
+{txt}
+{com}. gen quarter = substr(period, 6, 7)
+{txt}
+{com}. destring year quarter, replace
+{txt}year: all characters numeric; {res}replaced {txt}as {res}int
+{txt}quarter: all characters numeric; {res}replaced {txt}as {res}byte
+{txt}
+{com}. encode period, gen(period_num)
+{txt}
+{com}. 
+. 
+. gen yr = real(substr(period,1,4))
+{txt}
+{com}. gen mon = real(substr(period,6,.))      // 3,6,9,12
+{txt}
+{com}. gen qnum = mon/3                         // 1,2,3,4
+{txt}
+{com}. gen period2 = yq(yr, qnum)
+{txt}
+{com}. format period2 %tq
+{txt}
+{com}. 
+. tempfile nominal
+{txt}
+{com}. save `nominal'
+{txt}{p 0 4 2}
+file {bf}
+C:\Users\imedk\AppData\Local\Temp\ST_a314_000001.tmp{rm}
+saved
+as .dta format
+{p_end}
+
+{com}. 
+. *----- Growth GDRP Data -----*
+. import excel "$data/PDRB Seluruh Provinsi ADHK 2010-2025.xlsx", sheet("Growth") firstrow clear
+{res}{text}(62 vars, 35 obs)
+
+{com}. reshape long year_, i(prov) j(period, string)
+{res}{txt}(j = 2011_12 2011_3 2011_6 2011_9 2012_12 2012_3 2012_6 2012_9 2013_12 2013_3 2013_6 2013_9 2014_12 2014_3 2014_6 2014_9 2015_12 2015_3 2015_6 2015_9 2016_12 2016_3 2016_6 2016_9 2017_12 2017_3 2017_6 2017_9 2018_12 2018_3 2018_6 2018_9 2019_12 2019_3 2019_6 2019_9 2020_12 2020_3 2020_6 2020_9 2021_12 2021_3 2021_6 2021_9 2022_12 2022_3 2022_6 2022_9 2023_12 2023_3 2023_6 2023_9 2024_12 2024_3 2024_6 2024_9 2025_12 2025_3 2025_6 2025_9)
+
+Data{col 36}Wide{col 43}->{col 48}Long
+{hline 77}
+Number of observations     {res}          35   {txt}->   {res}2,100       
+{txt}Number of variables        {res}          62   {txt}->   {res}4           
+{txt}j variable (60 values)                    ->   {res}period
+{txt}xij variables:
+{res}year_2011_12 year_2011_3 ... year_2025_9  {txt}->   {res}year_
+{txt}{hline 77}
+
+{com}. ren year_ growth_qoq
+{res}{txt}
+{com}. gen year = substr(period, 1,4)
+{txt}
+{com}. gen quarter = substr(period, 6, 7)
+{txt}
+{com}. destring year quarter, replace
+{txt}year: all characters numeric; {res}replaced {txt}as {res}int
+{txt}quarter: all characters numeric; {res}replaced {txt}as {res}byte
+{txt}
+{com}. 
+. drop if prov==.
+{txt}(60 observations deleted)
+
+{com}. tempfile growth
+{txt}
+{com}. save `growth'
+{txt}{p 0 4 2}
+file {bf}
+C:\Users\imedk\AppData\Local\Temp\ST_a314_000002.tmp{rm}
+saved
+as .dta format
+{p_end}
+
+{com}.  
+. merge 1:1 prov year quarter using `nominal'
+{res}
+{txt}{col 5}Result{col 33}Number of obs
+{col 5}{hline 41}
+{col 5}Not matched{col 30}{res}             136
+{txt}{col 9}from master{col 30}{res}               0{txt}  (_merge==1)
+{col 9}from using{col 30}{res}             136{txt}  (_merge==2)
+
+{col 5}Matched{col 30}{res}           2,040{txt}  (_merge==3)
+{col 5}{hline 41}
+
+{com}. drop _m
+{txt}
+{com}. 
+. tempfile pdrb
+{txt}
+{com}. save `pdrb'
+{txt}{p 0 4 2}
+file {bf}
+C:\Users\imedk\AppData\Local\Temp\ST_a314_000003.tmp{rm}
+saved
+as .dta format
+{p_end}
+
+{com}. 
+. *-------------------------------------------------------------------------------
+. * Cleaning NTL
+. *-------------------------------------------------------------------------------
+. import excel "$data/ntl_monthly_long.xlsx", sheet("Sheet1") firstrow clear      
+{res}{text}(6 vars, 5,460 obs)
+
+{com}. 
+. gen quarter=.
+{txt}(5,460 missing values generated)
+
+{com}. replace quarter=3 if inrange(month, 1, 3)
+{txt}(1,365 real changes made)
+
+{com}. replace quarter=6 if inrange(month, 4,6)
+{txt}(1,365 real changes made)
+
+{com}. replace quarter=9 if inrange(month, 7,9)
+{txt}(1,365 real changes made)
+
+{com}. replace quarter=12 if inrange(month, 10, 12)
+{txt}(1,365 real changes made)
+
+{com}. 
+. collapse (mean) ntl_radiance, by(prov year quarter)
+{res}{txt}
+{com}. 
+. merge 1:1 prov year quarter using `pdrb' //Merging NTL with GDRP
+{res}
+{txt}{col 5}Result{col 33}Number of obs
+{col 5}{hline 41}
+{col 5}Not matched{col 30}{res}             408
+{txt}{col 9}from master{col 30}{res}               0{txt}  (_merge==1)
+{col 9}from using{col 30}{res}             408{txt}  (_merge==2)
+
+{col 5}Matched{col 30}{res}           1,768{txt}  (_merge==3)
+{col 5}{hline 41}
+
+{com}. 
+. *----- Additional Vars -----*
+. g               q1=0
+{txt}
+{com}. replace q1=1 if quarter==3 
+{txt}(544 real changes made)
+
+{com}. 
+. gen             q2=0
+{txt}
+{com}. replace q2=1 if quarter==6
+{txt}(544 real changes made)
+
+{com}. 
+. gen     q3=0
+{txt}
+{com}. replace q3=1 if quarter==9 //Quarter dummy
+{txt}(544 real changes made)
+
+{com}. 
+. g               covid=0
+{txt}
+{com}. replace covid=1 if inrange(year, 2020, 2022) //Covid dummy
+{txt}(408 real changes made)
+
+{com}. 
+. gen covid_cont = 0
+{txt}
+{com}. replace covid_cont = year - 2019 if inrange(year, 2020, 2022)
+{txt}(408 real changes made)
+
+{com}. 
+. g               scarring=0
+{txt}
+{com}. replace scarring=1 if inrange(year, 2020, 2025) //Scarring dummy
+{txt}(816 real changes made)
+
+{com}. 
+. gen scar_cont = 0
+{txt}
+{com}. replace scar_cont = year - 2019 if inrange(year, 2020, 2025)
+{txt}(816 real changes made)
+
+{com}. 
+. g               ln_ntl = ln(ntl_radiance)
+{txt}(408 missing values generated)
+
+{com}. g               ln_pdrb = ln(pdrb) //ln variables
+{txt}(68 missing values generated)
+
+{com}. 
+. gen pulau = .
+{txt}(2,176 missing values generated)
+
+{com}.     replace pulau = 1 if inrange(prov,11,21)
+{txt}(640 real changes made)
+
+{com}.     replace pulau = 2 if inrange(prov,31,36)
+{txt}(384 real changes made)
+
+{com}.     replace pulau = 3 if inrange(prov,51,53)
+{txt}(192 real changes made)
+
+{com}.     replace pulau = 4 if inrange(prov,61,65)
+{txt}(320 real changes made)
+
+{com}.     replace pulau = 5 if inrange(prov,71,76)
+{txt}(384 real changes made)
+
+{com}.     replace pulau = 6 if inrange(prov,81,82)
+{txt}(128 real changes made)
+
+{com}.     replace pulau = 7 if inrange(prov,91,97) //Island Variables
+{txt}(128 real changes made)
+
+{com}. 
+.     label define pulau_lbl  1 "SUMATERA" 2 "JAWA" 3 "BALI & NUSA TENGGARA" ///
+>                             4 "KALIMANTAN" 5 "SULAWESI" 6 "MALUKU" 7 "PAPUA"
+{txt}
+{com}.     label values pulau pulau_lbl
+{txt}
+{com}.         
+. 
+. *-------------------------------------------------------------------------------
+. * Analysis
+. *-------------------------------------------------------------------------------
+. gl x "ntl_radiance"
+{txt}
+{com}. gl x2 "ln_ntl"
+{txt}
+{com}. 
+. gl y "pdrb" 
+{txt}
+{com}. gl y2 "ln_pdrb"
+{txt}
+{com}. gl co "covid" //"covid"
+{txt}
+{com}. gl sc "scarring" //"scarring"
+{txt}
+{com}. 
+. gl year "2026"
+{txt}
+{com}. gl format "xls"
+{txt}
+{com}. gl master "ntl_analysis_master"
+{txt}
+{com}. gl dfe "ntl_analysis_ardlv3"
+{txt}
+{com}. gl ols "ntl_ols2"
+{txt}
+{com}. gl fe "ntl_fe2"
+{txt}
+{com}. gl twfe "ntl_twfe2"
+{txt}
+{com}. gl pmg "ntl_pmg2"
+{txt}
+{com}. 
+. 
+. *----- OLS -----* 
+. 
+. reg $y2 $x2 if year < $year, r
+
+{txt}Linear regression                               Number of obs     = {res}     1,768
+                                                {txt}F(1, 1766)        =  {res}  2231.18
+                                                {txt}Prob > F          = {res}    0.0000
+                                                {txt}R-squared         = {res}    0.5447
+                                                {txt}Root MSE          =    {res} .77815
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}     ln_pdrb{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 6}ln_ntl {c |}{col 14}{res}{space 2} .5608062{col 26}{space 2} .0118726{col 37}{space 1}   47.24{col 46}{space 3}0.000{col 54}{space 4} .5375204{col 67}{space 3}  .584092
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 11.33112{col 26}{space 2} .0278193{col 37}{space 1}  407.31{col 46}{space 3}0.000{col 54}{space 4} 11.27655{col 67}{space 3} 11.38568
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. predict e, resid
+{txt}(408 missing values generated)
+
+{com}. predict yhat_ols
+{txt}(option {bf:xb} assumed; fitted values)
+(408 missing values generated)
+
+{com}. gen abs_error_ols = abs($y2 - yhat_ols) 
+{txt}(408 missing values generated)
+
+{com}. gen error_ols = ($y2 - yhat_ols) 
+{txt}(408 missing values generated)
+
+{com}. outreg2 using "$reg/$master.$format", replace addtext(OLS, plain) label
+{txt}{browse `"C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.xls"'}
+{browse `"C:\Users\imedk\github\nitelite2\stata\Do"' :dir}{com} : {txt}{stata `"seeout using "C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.txt", label"':seeout}
+
+{com}. 
+. reg $y2 $x2 $co if year < $year, r 
+
+{txt}Linear regression                               Number of obs     = {res}     1,768
+                                                {txt}F(2, 1765)        =  {res}  1122.97
+                                                {txt}Prob > F          = {res}    0.0000
+                                                {txt}R-squared         = {res}    0.5461
+                                                {txt}Root MSE          =    {res} .77719
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}     ln_pdrb{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 6}ln_ntl {c |}{col 14}{res}{space 2}  .560196{col 26}{space 2} .0118429{col 37}{space 1}   47.30{col 46}{space 3}0.000{col 54}{space 4} .5369685{col 67}{space 3} .5834236
+{txt}{space 7}covid {c |}{col 14}{res}{space 2} .1015003{col 26}{space 2} .0437999{col 37}{space 1}    2.32{col 46}{space 3}0.021{col 54}{space 4} .0155951{col 67}{space 3} .1874055
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 11.30681{col 26}{space 2} .0297088{col 37}{space 1}  380.59{col 46}{space 3}0.000{col 54}{space 4} 11.24854{col 67}{space 3} 11.36508
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. predict e_ols_co, resid
+{txt}(408 missing values generated)
+
+{com}. predict yhat_ols_co
+{txt}(option {bf:xb} assumed; fitted values)
+(408 missing values generated)
+
+{com}. gen abs_error_ols_co = abs($y2 - yhat_ols_co) 
+{txt}(408 missing values generated)
+
+{com}. gen error_ols_co = ($y2 - yhat_ols_co) 
+{txt}(408 missing values generated)
+
+{com}. outreg2 using "$reg/$master.$format", append addtext(OLS, Covid) label
+{txt}{browse `"C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.xls"'}
+{browse `"C:\Users\imedk\github\nitelite2\stata\Do"' :dir}{com} : {txt}{stata `"seeout using "C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.txt", label"':seeout}
+
+{com}. 
+. reg $y2 $x2 $sc if year < $year, r 
+
+{txt}Linear regression                               Number of obs     = {res}     1,768
+                                                {txt}F(2, 1765)        =  {res}  1129.64
+                                                {txt}Prob > F          = {res}    0.0000
+                                                {txt}R-squared         = {res}    0.5459
+                                                {txt}Root MSE          =    {res} .77733
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}     ln_pdrb{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 6}ln_ntl {c |}{col 14}{res}{space 2} .5580639{col 26}{space 2}  .011857{col 37}{space 1}   47.07{col 46}{space 3}0.000{col 54}{space 4} .5348086{col 67}{space 3} .5813191
+{txt}{space 4}scarring {c |}{col 14}{res}{space 2} .0828599{col 26}{space 2} .0382595{col 37}{space 1}    2.17{col 46}{space 3}0.030{col 54}{space 4} .0078211{col 67}{space 3} .1578986
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 11.29527{col 26}{space 2} .0323229{col 37}{space 1}  349.45{col 46}{space 3}0.000{col 54}{space 4} 11.23188{col 67}{space 3} 11.35867
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. predict e_ols_sc, resid
+{txt}(408 missing values generated)
+
+{com}. predict yhat_ols_sc
+{txt}(option {bf:xb} assumed; fitted values)
+(408 missing values generated)
+
+{com}. gen abs_error_ols_sc = abs($y2 - yhat_ols_sc) 
+{txt}(408 missing values generated)
+
+{com}. gen error_ols_sc = ($y2 - yhat_ols_sc) 
+{txt}(408 missing values generated)
+
+{com}. outreg2 using "$reg/$master.$format", append addtext(OLS, Scarring) label
+{txt}{browse `"C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.xls"'}
+{browse `"C:\Users\imedk\github\nitelite2\stata\Do"' :dir}{com} : {txt}{stata `"seeout using "C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.txt", label"':seeout}
+
+{com}. 
+. *----- FE -----*
+. xtset prov period_num
+{res}
+{col 1}{txt:Panel variable: }{res:prov}{txt: (strongly balanced)}
+{p 1 16 2}{txt:Time variable: }{res:period_num}{txt:, }{res:{bind:1}}{txt: to }{res:{bind:64}}{p_end}
+{txt}{col 10}Delta: {res}1 unit
+{txt}
+{com}. 
+. xtreg $y2 $x2 if year < $year, fe cluster(prov)
+{res}
+{txt}Fixed-effects (within) regression{col 49}Number of obs{col 67}={col 69}{res}     1,768
+{txt}Group variable: {res}prov{txt}{col 49}Number of groups{col 67}={col 69}{res}        34
+
+{txt}R-squared:{col 49}Obs per group:
+     Within  = {res}0.3917{col 63}{txt}min{col 67}={col 69}{res}        52
+{txt}     Between = {res}0.5548{col 63}{txt}avg{col 67}={col 69}{res}      52.0
+{txt}     Overall = {res}0.5447{col 63}{txt}max{col 67}={col 69}{res}        52
+
+{txt}{col 49}F({res}1{txt}, {res}33{txt}){col 67}={col 70}{res}    84.74
+{txt}corr(u_i, Xb) = {res}0.4353{txt}{col 49}Prob > F{col 67}={col 73}{res}0.0000
+
+{txt}{ralign 78:(Std. err. adjusted for {res:34} clusters in {res:prov})}
+{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}     ln_pdrb{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 6}ln_ntl {c |}{col 14}{res}{space 2} .3170131{col 26}{space 2} .0344376{col 37}{space 1}    9.21{col 46}{space 3}0.000{col 54}{space 4} .2469493{col 67}{space 3} .3870769
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 10.97781{col 26}{space 2} .0499075{col 37}{space 1}  219.96{col 46}{space 3}0.000{col 54}{space 4} 10.87627{col 67}{space 3} 11.07934
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+     sigma_u {c |} {res} .86221602
+     {txt}sigma_e {c |} {res} .14288513
+         {txt}rho {c |} {res} .97327142{txt}   (fraction of variance due to u_i)
+{hline 13}{c BT}{hline 64}
+
+{com}. predict e_fe, resid
+{txt}(408 missing values generated)
+
+{com}. predict yhat_fe
+({txt}option {bf:xb} assumed; fitted values)
+(408 missing values generated)
+
+{com}. gen abs_error_fe = abs($y2 - yhat_fe) 
+{txt}(408 missing values generated)
+
+{com}. gen error_fe = ($y2 - yhat_fe) 
+{txt}(408 missing values generated)
+
+{com}. outreg2 using "$reg/$master.$format", append addtext(FE, plain) label
+{txt}{browse `"C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.xls"'}
+{browse `"C:\Users\imedk\github\nitelite2\stata\Do"' :dir}{com} : {txt}{stata `"seeout using "C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.txt", label"':seeout}
+
+{com}. 
+. xtreg $y2 $x2 $co if year < $year, fe cluster(prov)
+{res}
+{txt}Fixed-effects (within) regression{col 49}Number of obs{col 67}={col 69}{res}     1,768
+{txt}Group variable: {res}prov{txt}{col 49}Number of groups{col 67}={col 69}{res}        34
+
+{txt}R-squared:{col 49}Obs per group:
+     Within  = {res}0.4706{col 63}{txt}min{col 67}={col 69}{res}        52
+{txt}     Between = {res}0.5548{col 63}{txt}avg{col 67}={col 69}{res}      52.0
+{txt}     Overall = {res}0.5441{col 63}{txt}max{col 67}={col 69}{res}        52
+
+{txt}{col 49}F({res}2{txt}, {res}33{txt}){col 67}={col 70}{res}   109.50
+{txt}corr(u_i, Xb) = {res}0.4489{txt}{col 49}Prob > F{col 67}={col 73}{res}0.0000
+
+{txt}{ralign 78:(Std. err. adjusted for {res:34} clusters in {res:prov})}
+{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}     ln_pdrb{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 6}ln_ntl {c |}{col 14}{res}{space 2} .3039091{col 26}{space 2} .0317994{col 37}{space 1}    9.56{col 46}{space 3}0.000{col 54}{space 4} .2392128{col 67}{space 3} .3686054
+{txt}{space 7}covid {c |}{col 14}{res}{space 2} .1214696{col 26}{space 2}  .012052{col 37}{space 1}   10.08{col 46}{space 3}0.000{col 54}{space 4} .0969497{col 67}{space 3} .1459895
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 10.93078{col 26}{space 2} .0464978{col 37}{space 1}  235.08{col 46}{space 3}0.000{col 54}{space 4} 10.83618{col 67}{space 3} 11.02538
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+     sigma_u {c |} {res} .87117479
+     {txt}sigma_e {c |} {res} .13332957
+         {txt}rho {c |} {res} .97711309{txt}   (fraction of variance due to u_i)
+{hline 13}{c BT}{hline 64}
+
+{com}. predict e_fe_co, resid
+{txt}(408 missing values generated)
+
+{com}. predict yhat_fe_co
+({txt}option {bf:xb} assumed; fitted values)
+(408 missing values generated)
+
+{com}. gen abs_error_fe_co = abs($y2 - yhat_fe_co) 
+{txt}(408 missing values generated)
+
+{com}. gen error_fe_co = ($y2 - yhat_fe_co) 
+{txt}(408 missing values generated)
+
+{com}. outreg2 using "$reg/$master.$format", append addtext(FE, Covid) label
+{txt}{browse `"C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.xls"'}
+{browse `"C:\Users\imedk\github\nitelite2\stata\Do"' :dir}{com} : {txt}{stata `"seeout using "C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.txt", label"':seeout}
+
+{com}. 
+. xtreg $y2 $x2 $sc if year < $year, fe cluster(prov)
+{res}
+{txt}Fixed-effects (within) regression{col 49}Number of obs{col 67}={col 69}{res}     1,768
+{txt}Group variable: {res}prov{txt}{col 49}Number of groups{col 67}={col 69}{res}        34
+
+{txt}R-squared:{col 49}Obs per group:
+     Within  = {res}0.6205{col 63}{txt}min{col 67}={col 69}{res}        52
+{txt}     Between = {res}0.5548{col 63}{txt}avg{col 67}={col 69}{res}      52.0
+{txt}     Overall = {res}0.5122{col 63}{txt}max{col 67}={col 69}{res}        52
+
+{txt}{col 49}F({res}2{txt}, {res}33{txt}){col 67}={col 70}{res}   120.10
+{txt}corr(u_i, Xb) = {res}0.5300{txt}{col 49}Prob > F{col 67}={col 73}{res}0.0000
+
+{txt}{ralign 78:(Std. err. adjusted for {res:34} clusters in {res:prov})}
+{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}     ln_pdrb{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 6}ln_ntl {c |}{col 14}{res}{space 2} .1992571{col 26}{space 2} .0276848{col 37}{space 1}    7.20{col 46}{space 3}0.000{col 54}{space 4} .1429318{col 67}{space 3} .2555823
+{txt}{space 4}scarring {c |}{col 14}{res}{space 2} .1982878{col 26}{space 2} .0149632{col 37}{space 1}   13.25{col 46}{space 3}0.000{col 54}{space 4}  .167845{col 67}{space 3} .2287307
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 10.73089{col 26}{space 2} .0408846{col 37}{space 1}  262.47{col 46}{space 3}0.000{col 54}{space 4} 10.64771{col 67}{space 3} 10.81407
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+     sigma_u {c |} {res} .95422606
+     {txt}sigma_e {c |} {res} .11288624
+         {txt}rho {c |} {res} .98619795{txt}   (fraction of variance due to u_i)
+{hline 13}{c BT}{hline 64}
+
+{com}. predict e_fe_sc, resid
+{txt}(408 missing values generated)
+
+{com}. predict yhat_fe_sc
+({txt}option {bf:xb} assumed; fitted values)
+(408 missing values generated)
+
+{com}. gen abs_error_fe_sc = abs($y2 - yhat_fe_sc) 
+{txt}(408 missing values generated)
+
+{com}. gen error_fe_sc = ($y2 - yhat_fe_sc) 
+{txt}(408 missing values generated)
+
+{com}. outreg2 using "$reg/$master.$format", append addtext(FE, Scarring) label
+{txt}{browse `"C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.xls"'}
+{browse `"C:\Users\imedk\github\nitelite2\stata\Do"' :dir}{com} : {txt}{stata `"seeout using "C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.txt", label"':seeout}
+
+{com}. 
+. *----- TWFE -----* 
+. xtreg $y2 $x2 i.year if year < $year, fe cluster(prov) 
+{res}
+{txt}Fixed-effects (within) regression{col 49}Number of obs{col 67}={col 69}{res}     1,768
+{txt}Group variable: {res}prov{txt}{col 49}Number of groups{col 67}={col 69}{res}        34
+
+{txt}R-squared:{col 49}Obs per group:
+     Within  = {res}0.8371{col 63}{txt}min{col 67}={col 69}{res}        52
+{txt}     Between = {res}0.5548{col 63}{txt}avg{col 67}={col 69}{res}      52.0
+{txt}     Overall = {res}0.2423{col 63}{txt}max{col 67}={col 69}{res}        52
+
+{txt}{col 49}F({res}13{txt}, {res}33{txt}){col 67}={col 70}{res}    78.53
+{txt}corr(u_i, Xb) = {res}0.3515{txt}{col 49}Prob > F{col 67}={col 73}{res}0.0000
+
+{txt}{ralign 78:(Std. err. adjusted for {res:34} clusters in {res:prov})}
+{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}     ln_pdrb{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 6}ln_ntl {c |}{col 14}{res}{space 2} .0649291{col 26}{space 2} .0250165{col 37}{space 1}    2.60{col 46}{space 3}0.014{col 54}{space 4} .0140326{col 67}{space 3} .1158256
+{txt}{space 12} {c |}
+{space 8}year {c |}
+{space 7}2013  {c |}{col 14}{res}{space 2} .0481456{col 26}{space 2} .0051702{col 37}{space 1}    9.31{col 46}{space 3}0.000{col 54}{space 4} .0376269{col 67}{space 3} .0586644
+{txt}{space 7}2014  {c |}{col 14}{res}{space 2}  .096385{col 26}{space 2}  .009005{col 37}{space 1}   10.70{col 46}{space 3}0.000{col 54}{space 4} .0780641{col 67}{space 3} .1147058
+{txt}{space 7}2015  {c |}{col 14}{res}{space 2} .1414059{col 26}{space 2} .0131989{col 37}{space 1}   10.71{col 46}{space 3}0.000{col 54}{space 4} .1145525{col 67}{space 3} .1682592
+{txt}{space 7}2016  {c |}{col 14}{res}{space 2} .2009073{col 26}{space 2} .0133426{col 37}{space 1}   15.06{col 46}{space 3}0.000{col 54}{space 4} .1737615{col 67}{space 3}  .228053
+{txt}{space 7}2017  {c |}{col 14}{res}{space 2} .2478157{col 26}{space 2} .0145493{col 37}{space 1}   17.03{col 46}{space 3}0.000{col 54}{space 4} .2182149{col 67}{space 3} .2774166
+{txt}{space 7}2018  {c |}{col 14}{res}{space 2} .2957588{col 26}{space 2} .0168154{col 37}{space 1}   17.59{col 46}{space 3}0.000{col 54}{space 4} .2615475{col 67}{space 3}   .32997
+{txt}{space 7}2019  {c |}{col 14}{res}{space 2} .3345863{col 26}{space 2} .0188348{col 37}{space 1}   17.76{col 46}{space 3}0.000{col 54}{space 4} .2962665{col 67}{space 3}  .372906
+{txt}{space 7}2020  {c |}{col 14}{res}{space 2} .3318407{col 26}{space 2} .0180262{col 37}{space 1}   18.41{col 46}{space 3}0.000{col 54}{space 4} .2951661{col 67}{space 3} .3685154
+{txt}{space 7}2021  {c |}{col 14}{res}{space 2} .3689077{col 26}{space 2} .0185982{col 37}{space 1}   19.84{col 46}{space 3}0.000{col 54}{space 4} .3310694{col 67}{space 3}  .406746
+{txt}{space 7}2022  {c |}{col 14}{res}{space 2}  .413069{col 26}{space 2} .0205704{col 37}{space 1}   20.08{col 46}{space 3}0.000{col 54}{space 4} .3712182{col 67}{space 3} .4549198
+{txt}{space 7}2023  {c |}{col 14}{res}{space 2} .4487685{col 26}{space 2} .0215646{col 37}{space 1}   20.81{col 46}{space 3}0.000{col 54}{space 4} .4048951{col 67}{space 3}  .492642
+{txt}{space 7}2024  {c |}{col 14}{res}{space 2} .4980473{col 26}{space 2} .0264733{col 37}{space 1}   18.81{col 46}{space 3}0.000{col 54}{space 4}  .444187{col 67}{space 3} .5519076
+{txt}{space 12} {c |}
+{space 7}_cons {c |}{col 14}{res}{space 2} 10.34897{col 26}{space 2}  .043346{col 37}{space 1}  238.75{col 46}{space 3}0.000{col 54}{space 4} 10.26078{col 67}{space 3} 10.43716
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+     sigma_u {c |} {res} 1.0848914
+     {txt}sigma_e {c |} {res} .07420671
+         {txt}rho {c |} {res} .99534321{txt}   (fraction of variance due to u_i)
+{hline 13}{c BT}{hline 64}
+
+{com}. predict e_twfe, resid
+{txt}(408 missing values generated)
+
+{com}. predict yhat_twfe
+({txt}option {bf:xb} assumed; fitted values)
+(408 missing values generated)
+
+{com}. gen abs_error_twfe = abs($y2 - yhat_twfe) 
+{txt}(408 missing values generated)
+
+{com}. gen error_twfe = ($y2 - yhat_twfe) 
+{txt}(408 missing values generated)
+
+{com}. outreg2 using "$reg/$master.$format", append addtext(TWFE, plain) label
+{txt}{browse `"C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.xls"'}
+{browse `"C:\Users\imedk\github\nitelite2\stata\Do"' :dir}{com} : {txt}{stata `"seeout using "C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.txt", label"':seeout}
+
+{com}. 
+. xtreg $y2 $x2 $co i.year if year < $year, fe cluster(prov) 
+{txt}{p 0 6 2}note: {bf:2022.year} omitted because of collinearity.{p_end}
+{res}
+{txt}Fixed-effects (within) regression{col 49}Number of obs{col 67}={col 69}{res}     1,768
+{txt}Group variable: {res}prov{txt}{col 49}Number of groups{col 67}={col 69}{res}        34
+
+{txt}R-squared:{col 49}Obs per group:
+     Within  = {res}0.8371{col 63}{txt}min{col 67}={col 69}{res}        52
+{txt}     Between = {res}0.5548{col 63}{txt}avg{col 67}={col 69}{res}      52.0
+{txt}     Overall = {res}0.2423{col 63}{txt}max{col 67}={col 69}{res}        52
+
+{txt}{col 49}F({res}13{txt}, {res}33{txt}){col 67}={col 70}{res}    78.53
+{txt}corr(u_i, Xb) = {res}0.3515{txt}{col 49}Prob > F{col 67}={col 73}{res}0.0000
+
+{txt}{ralign 78:(Std. err. adjusted for {res:34} clusters in {res:prov})}
+{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}     ln_pdrb{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 6}ln_ntl {c |}{col 14}{res}{space 2} .0649291{col 26}{space 2} .0250165{col 37}{space 1}    2.60{col 46}{space 3}0.014{col 54}{space 4} .0140326{col 67}{space 3} .1158256
+{txt}{space 7}covid {c |}{col 14}{res}{space 2}  .413069{col 26}{space 2} .0205704{col 37}{space 1}   20.08{col 46}{space 3}0.000{col 54}{space 4} .3712182{col 67}{space 3} .4549198
+{txt}{space 12} {c |}
+{space 8}year {c |}
+{space 7}2013  {c |}{col 14}{res}{space 2} .0481456{col 26}{space 2} .0051702{col 37}{space 1}    9.31{col 46}{space 3}0.000{col 54}{space 4} .0376269{col 67}{space 3} .0586644
+{txt}{space 7}2014  {c |}{col 14}{res}{space 2}  .096385{col 26}{space 2}  .009005{col 37}{space 1}   10.70{col 46}{space 3}0.000{col 54}{space 4} .0780641{col 67}{space 3} .1147058
+{txt}{space 7}2015  {c |}{col 14}{res}{space 2} .1414059{col 26}{space 2} .0131989{col 37}{space 1}   10.71{col 46}{space 3}0.000{col 54}{space 4} .1145525{col 67}{space 3} .1682592
+{txt}{space 7}2016  {c |}{col 14}{res}{space 2} .2009073{col 26}{space 2} .0133426{col 37}{space 1}   15.06{col 46}{space 3}0.000{col 54}{space 4} .1737615{col 67}{space 3}  .228053
+{txt}{space 7}2017  {c |}{col 14}{res}{space 2} .2478157{col 26}{space 2} .0145493{col 37}{space 1}   17.03{col 46}{space 3}0.000{col 54}{space 4} .2182149{col 67}{space 3} .2774166
+{txt}{space 7}2018  {c |}{col 14}{res}{space 2} .2957588{col 26}{space 2} .0168154{col 37}{space 1}   17.59{col 46}{space 3}0.000{col 54}{space 4} .2615475{col 67}{space 3}   .32997
+{txt}{space 7}2019  {c |}{col 14}{res}{space 2} .3345863{col 26}{space 2} .0188348{col 37}{space 1}   17.76{col 46}{space 3}0.000{col 54}{space 4} .2962665{col 67}{space 3}  .372906
+{txt}{space 7}2020  {c |}{col 14}{res}{space 2}-.0812283{col 26}{space 2} .0073328{col 37}{space 1}  -11.08{col 46}{space 3}0.000{col 54}{space 4}-.0961471{col 67}{space 3}-.0663095
+{txt}{space 7}2021  {c |}{col 14}{res}{space 2}-.0441613{col 26}{space 2} .0032774{col 37}{space 1}  -13.47{col 46}{space 3}0.000{col 54}{space 4}-.0508291{col 67}{space 3}-.0374935
+{txt}{space 7}2022  {c |}{col 14}{res}{space 2}        0{col 26}{txt}  (omitted)
+{space 7}2023  {c |}{col 14}{res}{space 2} .4487685{col 26}{space 2} .0215646{col 37}{space 1}   20.81{col 46}{space 3}0.000{col 54}{space 4} .4048951{col 67}{space 3}  .492642
+{txt}{space 7}2024  {c |}{col 14}{res}{space 2} .4980473{col 26}{space 2} .0264733{col 37}{space 1}   18.81{col 46}{space 3}0.000{col 54}{space 4}  .444187{col 67}{space 3} .5519076
+{txt}{space 12} {c |}
+{space 7}_cons {c |}{col 14}{res}{space 2} 10.34897{col 26}{space 2}  .043346{col 37}{space 1}  238.75{col 46}{space 3}0.000{col 54}{space 4} 10.26078{col 67}{space 3} 10.43716
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+     sigma_u {c |} {res} 1.0848914
+     {txt}sigma_e {c |} {res} .07420671
+         {txt}rho {c |} {res} .99534321{txt}   (fraction of variance due to u_i)
+{hline 13}{c BT}{hline 64}
+
+{com}. predict e_twfe_co, resid
+{txt}(408 missing values generated)
+
+{com}. predict yhat_twfe_co
+({txt}option {bf:xb} assumed; fitted values)
+(408 missing values generated)
+
+{com}. gen abs_error_twfe_co = abs($y2 - yhat_twfe_co) 
+{txt}(408 missing values generated)
+
+{com}. gen error_twfe_co = ($y2 - yhat_twfe_co)
+{txt}(408 missing values generated)
+
+{com}. outreg2 using "$reg/$master.$format", append addtext(TWFE, Covid) label
+{txt}{browse `"C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.xls"'}
+{browse `"C:\Users\imedk\github\nitelite2\stata\Do"' :dir}{com} : {txt}{stata `"seeout using "C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.txt", label"':seeout}
+
+{com}. 
+. xtreg $y2 $x2 $sc i.year if year < $year, fe cluster(prov) 
+{txt}{p 0 6 2}note: {bf:2024.year} omitted because of collinearity.{p_end}
+{res}
+{txt}Fixed-effects (within) regression{col 49}Number of obs{col 67}={col 69}{res}     1,768
+{txt}Group variable: {res}prov{txt}{col 49}Number of groups{col 67}={col 69}{res}        34
+
+{txt}R-squared:{col 49}Obs per group:
+     Within  = {res}0.8371{col 63}{txt}min{col 67}={col 69}{res}        52
+{txt}     Between = {res}0.5548{col 63}{txt}avg{col 67}={col 69}{res}      52.0
+{txt}     Overall = {res}0.2423{col 63}{txt}max{col 67}={col 69}{res}        52
+
+{txt}{col 49}F({res}13{txt}, {res}33{txt}){col 67}={col 70}{res}    78.53
+{txt}corr(u_i, Xb) = {res}0.3515{txt}{col 49}Prob > F{col 67}={col 73}{res}0.0000
+
+{txt}{ralign 78:(Std. err. adjusted for {res:34} clusters in {res:prov})}
+{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |}{col 26}    Robust
+{col 1}     ln_pdrb{col 14}{c |} Coefficient{col 26}  std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 6}ln_ntl {c |}{col 14}{res}{space 2} .0649291{col 26}{space 2} .0250165{col 37}{space 1}    2.60{col 46}{space 3}0.014{col 54}{space 4} .0140326{col 67}{space 3} .1158256
+{txt}{space 4}scarring {c |}{col 14}{res}{space 2} .4980473{col 26}{space 2} .0264733{col 37}{space 1}   18.81{col 46}{space 3}0.000{col 54}{space 4}  .444187{col 67}{space 3} .5519076
+{txt}{space 12} {c |}
+{space 8}year {c |}
+{space 7}2013  {c |}{col 14}{res}{space 2} .0481456{col 26}{space 2} .0051702{col 37}{space 1}    9.31{col 46}{space 3}0.000{col 54}{space 4} .0376269{col 67}{space 3} .0586644
+{txt}{space 7}2014  {c |}{col 14}{res}{space 2}  .096385{col 26}{space 2}  .009005{col 37}{space 1}   10.70{col 46}{space 3}0.000{col 54}{space 4} .0780641{col 67}{space 3} .1147058
+{txt}{space 7}2015  {c |}{col 14}{res}{space 2} .1414059{col 26}{space 2} .0131989{col 37}{space 1}   10.71{col 46}{space 3}0.000{col 54}{space 4} .1145525{col 67}{space 3} .1682592
+{txt}{space 7}2016  {c |}{col 14}{res}{space 2} .2009073{col 26}{space 2} .0133426{col 37}{space 1}   15.06{col 46}{space 3}0.000{col 54}{space 4} .1737615{col 67}{space 3}  .228053
+{txt}{space 7}2017  {c |}{col 14}{res}{space 2} .2478157{col 26}{space 2} .0145493{col 37}{space 1}   17.03{col 46}{space 3}0.000{col 54}{space 4} .2182149{col 67}{space 3} .2774166
+{txt}{space 7}2018  {c |}{col 14}{res}{space 2} .2957588{col 26}{space 2} .0168154{col 37}{space 1}   17.59{col 46}{space 3}0.000{col 54}{space 4} .2615475{col 67}{space 3}   .32997
+{txt}{space 7}2019  {c |}{col 14}{res}{space 2} .3345863{col 26}{space 2} .0188348{col 37}{space 1}   17.76{col 46}{space 3}0.000{col 54}{space 4} .2962665{col 67}{space 3}  .372906
+{txt}{space 7}2020  {c |}{col 14}{res}{space 2}-.1662066{col 26}{space 2} .0169595{col 37}{space 1}   -9.80{col 46}{space 3}0.000{col 54}{space 4}-.2007109{col 67}{space 3}-.1317023
+{txt}{space 7}2021  {c |}{col 14}{res}{space 2}-.1291396{col 26}{space 2} .0138445{col 37}{space 1}   -9.33{col 46}{space 3}0.000{col 54}{space 4}-.1573065{col 67}{space 3}-.1009728
+{txt}{space 7}2022  {c |}{col 14}{res}{space 2}-.0849783{col 26}{space 2} .0115838{col 37}{space 1}   -7.34{col 46}{space 3}0.000{col 54}{space 4}-.1085457{col 67}{space 3} -.061411
+{txt}{space 7}2023  {c |}{col 14}{res}{space 2}-.0492788{col 26}{space 2} .0110099{col 37}{space 1}   -4.48{col 46}{space 3}0.000{col 54}{space 4}-.0716785{col 67}{space 3}-.0268791
+{txt}{space 7}2024  {c |}{col 14}{res}{space 2}        0{col 26}{txt}  (omitted)
+{space 12} {c |}
+{space 7}_cons {c |}{col 14}{res}{space 2} 10.34897{col 26}{space 2}  .043346{col 37}{space 1}  238.75{col 46}{space 3}0.000{col 54}{space 4} 10.26078{col 67}{space 3} 10.43716
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+     sigma_u {c |} {res} 1.0848914
+     {txt}sigma_e {c |} {res} .07420671
+         {txt}rho {c |} {res} .99534321{txt}   (fraction of variance due to u_i)
+{hline 13}{c BT}{hline 64}
+
+{com}. predict e_twfe_sc, resid
+{txt}(408 missing values generated)
+
+{com}. predict yhat_twfe_sc
+({txt}option {bf:xb} assumed; fitted values)
+(408 missing values generated)
+
+{com}. gen abs_error_twfe_sc = abs($y2 - yhat_twfe_sc) 
+{txt}(408 missing values generated)
+
+{com}. gen error_twfe_sc = ($y2 - yhat_twfe_sc) 
+{txt}(408 missing values generated)
+
+{com}. outreg2 using "$reg/$master.$format", append addtext(TWFE, Scarring) label
+{txt}{browse `"C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.xls"'}
+{browse `"C:\Users\imedk\github\nitelite2\stata\Do"' :dir}{com} : {txt}{stata `"seeout using "C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.txt", label"':seeout}
+
+{com}. 
+. 
+. *----- DFE -----* 
+. xtpmg d.$y2 d.L(1/4).$y2 d.$x2 d.L(1/4).$x2 if year < $year, ///
+>       lr(L.$y2 $x2) ec(ec_dfe) replace dfe
+{txt}{hline 78}
+Dynamic Fixed Effects Regression: {res}Estimated Error Correction Form
+{txt}(Estimate results saved as {res}DFE{txt})
+{hline 78}
+{res}{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}ec_dfe       {txt}{c |}
+{space 6}ln_ntl {c |}{col 14}{res}{space 2} .4495755{col 26}{space 2} .1093853{col 37}{space 1}    4.11{col 46}{space 3}0.000{col 54}{space 4} .2351843{col 67}{space 3} .6639667
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}SR           {txt}{c |}
+{space 6}ec_dfe {c |}{col 14}{res}{space 2}-.0322586{col 26}{space 2} .0085194{col 37}{space 1}   -3.79{col 46}{space 3}0.000{col 54}{space 4}-.0489565{col 67}{space 3}-.0155608
+{txt}{space 12} {c |}
+{space 5}ln_pdrb {c |}
+{space 9}LD. {c |}{col 14}{res}{space 2}-.5336124{col 26}{space 2} .0242811{col 37}{space 1}  -21.98{col 46}{space 3}0.000{col 54}{space 4}-.5812025{col 67}{space 3}-.4860223
+{txt}{space 8}L2D. {c |}{col 14}{res}{space 2}-.4770372{col 26}{space 2} .0252772{col 37}{space 1}  -18.87{col 46}{space 3}0.000{col 54}{space 4}-.5265795{col 67}{space 3}-.4274948
+{txt}{space 8}L3D. {c |}{col 14}{res}{space 2}-.4479672{col 26}{space 2} .0251431{col 37}{space 1}  -17.82{col 46}{space 3}0.000{col 54}{space 4}-.4972469{col 67}{space 3}-.3986876
+{txt}{space 8}L4D. {c |}{col 14}{res}{space 2} .3371955{col 26}{space 2} .0239694{col 37}{space 1}   14.07{col 46}{space 3}0.000{col 54}{space 4} .2902163{col 67}{space 3} .3841746
+{txt}{space 12} {c |}
+{space 6}ln_ntl {c |}
+{space 9}D1. {c |}{col 14}{res}{space 2} .0092049{col 26}{space 2}   .00569{col 37}{space 1}    1.62{col 46}{space 3}0.106{col 54}{space 4}-.0019473{col 67}{space 3} .0203571
+{txt}{space 9}LD. {c |}{col 14}{res}{space 2}  .007798{col 26}{space 2} .0055818{col 37}{space 1}    1.40{col 46}{space 3}0.162{col 54}{space 4}-.0031421{col 67}{space 3} .0187381
+{txt}{space 8}L2D. {c |}{col 14}{res}{space 2} .0144205{col 26}{space 2} .0052486{col 37}{space 1}    2.75{col 46}{space 3}0.006{col 54}{space 4} .0041333{col 67}{space 3} .0247076
+{txt}{space 8}L3D. {c |}{col 14}{res}{space 2} .0028808{col 26}{space 2} .0043699{col 37}{space 1}    0.66{col 46}{space 3}0.510{col 54}{space 4} -.005684{col 67}{space 3} .0114457
+{txt}{space 8}L4D. {c |}{col 14}{res}{space 2} -.001292{col 26}{space 2} .0033091{col 37}{space 1}   -0.39{col 46}{space 3}0.696{col 54}{space 4}-.0077778{col 67}{space 3} .0051937
+{txt}{space 12} {c |}
+{space 7}_cons {c |}{col 14}{res}{space 2} .3834287{col 26}{space 2}  .096089{col 37}{space 1}    3.99{col 46}{space 3}0.000{col 54}{space 4} .1950978{col 67}{space 3} .5717596
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. predict yhat_dfe, xb
+{txt}(408 missing values generated)
+
+{com}. gen e_dfe = $y2 - yhat_dfe  
+{txt}(408 missing values generated)
+
+{com}. outreg2 using "$reg/$master.$format", append addtext(DFE, plain) label
+{txt}{browse `"C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.xls"'}
+{browse `"C:\Users\imedk\github\nitelite2\stata\Do"' :dir}{com} : {txt}{stata `"seeout using "C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.txt", label"':seeout}
+
+{com}. 
+. xtpmg d.$y2 d.L(1/4).$y2 d.$x2 d.L(1/4).$x2 ///
+>       d.$co d.L(1/4).$co if year < $year, ///
+>       lr(L.$y2 $x2 $co) ec(ec_dfe_co) replace dfe
+{txt}{hline 78}
+Dynamic Fixed Effects Regression: {res}Estimated Error Correction Form
+{txt}(Estimate results saved as {res}DFE{txt})
+{hline 78}
+{res}{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}ec_dfe_co    {txt}{c |}
+{space 6}ln_ntl {c |}{col 14}{res}{space 2} .2005799{col 26}{space 2} .1804176{col 37}{space 1}    1.11{col 46}{space 3}0.266{col 54}{space 4}-.1530321{col 67}{space 3} .5541918
+{txt}{space 7}covid {c |}{col 14}{res}{space 2}-.1094679{col 26}{space 2} .1345737{col 37}{space 1}   -0.81{col 46}{space 3}0.416{col 54}{space 4}-.3732275{col 67}{space 3} .1542917
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}SR           {txt}{c |}
+{space 3}ec_dfe_co {c |}{col 14}{res}{space 2}-.0242581{col 26}{space 2}  .009374{col 37}{space 1}   -2.59{col 46}{space 3}0.010{col 54}{space 4}-.0426308{col 67}{space 3}-.0058853
+{txt}{space 12} {c |}
+{space 5}ln_pdrb {c |}
+{space 9}LD. {c |}{col 14}{res}{space 2}-.5478607{col 26}{space 2} .0253157{col 37}{space 1}  -21.64{col 46}{space 3}0.000{col 54}{space 4}-.5974785{col 67}{space 3}-.4982428
+{txt}{space 8}L2D. {c |}{col 14}{res}{space 2} -.497188{col 26}{space 2} .0258168{col 37}{space 1}  -19.26{col 46}{space 3}0.000{col 54}{space 4} -.547788{col 67}{space 3} -.446588
+{txt}{space 8}L3D. {c |}{col 14}{res}{space 2}-.4710906{col 26}{space 2} .0255171{col 37}{space 1}  -18.46{col 46}{space 3}0.000{col 54}{space 4}-.5211031{col 67}{space 3} -.421078
+{txt}{space 8}L4D. {c |}{col 14}{res}{space 2} .3227042{col 26}{space 2} .0241013{col 37}{space 1}   13.39{col 46}{space 3}0.000{col 54}{space 4} .2754665{col 67}{space 3} .3699419
+{txt}{space 12} {c |}
+{space 6}ln_ntl {c |}
+{space 9}D1. {c |}{col 14}{res}{space 2} .0059439{col 26}{space 2} .0057046{col 37}{space 1}    1.04{col 46}{space 3}0.297{col 54}{space 4} -.005237{col 67}{space 3} .0171247
+{txt}{space 9}LD. {c |}{col 14}{res}{space 2} .0039686{col 26}{space 2} .0055339{col 37}{space 1}    0.72{col 46}{space 3}0.473{col 54}{space 4}-.0068776{col 67}{space 3} .0148149
+{txt}{space 8}L2D. {c |}{col 14}{res}{space 2} .0070643{col 26}{space 2}  .005149{col 37}{space 1}    1.37{col 46}{space 3}0.170{col 54}{space 4}-.0030276{col 67}{space 3} .0171562
+{txt}{space 8}L3D. {c |}{col 14}{res}{space 2}-.0058825{col 26}{space 2} .0042752{col 37}{space 1}   -1.38{col 46}{space 3}0.169{col 54}{space 4}-.0142617{col 67}{space 3} .0024967
+{txt}{space 8}L4D. {c |}{col 14}{res}{space 2}-.0030219{col 26}{space 2} .0031931{col 37}{space 1}   -0.95{col 46}{space 3}0.344{col 54}{space 4}-.0092802{col 67}{space 3} .0032363
+{txt}{space 12} {c |}
+{space 7}covid {c |}
+{space 9}D1. {c |}{col 14}{res}{space 2}-.0333632{col 26}{space 2} .0042624{col 37}{space 1}   -7.83{col 46}{space 3}0.000{col 54}{space 4}-.0417173{col 67}{space 3} -.025009
+{txt}{space 9}LD. {c |}{col 14}{res}{space 2} .0074654{col 26}{space 2} .0043228{col 37}{space 1}    1.73{col 46}{space 3}0.084{col 54}{space 4}-.0010072{col 67}{space 3}  .015938
+{txt}{space 8}L2D. {c |}{col 14}{res}{space 2}-.0346239{col 26}{space 2} .0042726{col 37}{space 1}   -8.10{col 46}{space 3}0.000{col 54}{space 4} -.042998{col 67}{space 3}-.0262498
+{txt}{space 8}L3D. {c |}{col 14}{res}{space 2}-.0184508{col 26}{space 2} .0043726{col 37}{space 1}   -4.22{col 46}{space 3}0.000{col 54}{space 4}-.0270209{col 67}{space 3}-.0098808
+{txt}{space 8}L4D. {c |}{col 14}{res}{space 2} .0174527{col 26}{space 2} .0043446{col 37}{space 1}    4.02{col 46}{space 3}0.000{col 54}{space 4} .0089375{col 67}{space 3}  .025968
+{txt}{space 12} {c |}
+{space 7}_cons {c |}{col 14}{res}{space 2} .2875782{col 26}{space 2} .1046334{col 37}{space 1}    2.75{col 46}{space 3}0.006{col 54}{space 4} .0825005{col 67}{space 3} .4926558
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. predict yhat_dfe_co, xb
+{txt}(408 missing values generated)
+
+{com}. gen e_dfe_co = $y2 - yhat_dfe_co  
+{txt}(408 missing values generated)
+
+{com}. outreg2 using "$reg/$master.$format", append addtext(DFE, Covid) label
+{txt}{browse `"C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.xls"'}
+{browse `"C:\Users\imedk\github\nitelite2\stata\Do"' :dir}{com} : {txt}{stata `"seeout using "C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.txt", label"':seeout}
+
+{com}. 
+. xtpmg d.$y2 d.L(1/4).$y2 d.$x2 d.L(1/4).$x2 ///
+>       d.$sc d.L(1/4).$sc if year < $year, ///
+>       lr(L.$y2 $x2 $sc) ec(ec_dfe_sc) replace dfe
+{txt}{hline 78}
+Dynamic Fixed Effects Regression: {res}Estimated Error Correction Form
+{txt}(Estimate results saved as {res}DFE{txt})
+{hline 78}
+{res}{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}ec_dfe_sc    {txt}{c |}
+{space 6}ln_ntl {c |}{col 14}{res}{space 2} .6726023{col 26}{space 2} .3352337{col 37}{space 1}    2.01{col 46}{space 3}0.045{col 54}{space 4} .0155563{col 67}{space 3} 1.329648
+{txt}{space 4}scarring {c |}{col 14}{res}{space 2}-.1753192{col 26}{space 2} .2490456{col 37}{space 1}   -0.70{col 46}{space 3}0.481{col 54}{space 4}-.6634396{col 67}{space 3} .3128013
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}SR           {txt}{c |}
+{space 3}ec_dfe_sc {c |}{col 14}{res}{space 2}-.0152046{col 26}{space 2} .0095142{col 37}{space 1}   -1.60{col 46}{space 3}0.110{col 54}{space 4}-.0338521{col 67}{space 3}  .003443
+{txt}{space 12} {c |}
+{space 5}ln_pdrb {c |}
+{space 9}LD. {c |}{col 14}{res}{space 2}-.5567954{col 26}{space 2}  .025287{col 37}{space 1}  -22.02{col 46}{space 3}0.000{col 54}{space 4}-.6063571{col 67}{space 3}-.5072338
+{txt}{space 8}L2D. {c |}{col 14}{res}{space 2}-.4844966{col 26}{space 2}  .025944{col 37}{space 1}  -18.67{col 46}{space 3}0.000{col 54}{space 4} -.535346{col 67}{space 3}-.4336472
+{txt}{space 8}L3D. {c |}{col 14}{res}{space 2}-.4591526{col 26}{space 2} .0256972{col 37}{space 1}  -17.87{col 46}{space 3}0.000{col 54}{space 4}-.5095183{col 67}{space 3} -.408787
+{txt}{space 8}L4D. {c |}{col 14}{res}{space 2} .3622559{col 26}{space 2} .0240945{col 37}{space 1}   15.03{col 46}{space 3}0.000{col 54}{space 4} .3150315{col 67}{space 3} .4094804
+{txt}{space 12} {c |}
+{space 6}ln_ntl {c |}
+{space 9}D1. {c |}{col 14}{res}{space 2} .0027249{col 26}{space 2} .0051361{col 37}{space 1}    0.53{col 46}{space 3}0.596{col 54}{space 4}-.0073416{col 67}{space 3} .0127915
+{txt}{space 9}LD. {c |}{col 14}{res}{space 2} .0023484{col 26}{space 2} .0050371{col 37}{space 1}    0.47{col 46}{space 3}0.641{col 54}{space 4}-.0075242{col 67}{space 3}  .012221
+{txt}{space 8}L2D. {c |}{col 14}{res}{space 2} .0065546{col 26}{space 2}  .004753{col 37}{space 1}    1.38{col 46}{space 3}0.168{col 54}{space 4}-.0027611{col 67}{space 3} .0158702
+{txt}{space 8}L3D. {c |}{col 14}{res}{space 2}-.0033889{col 26}{space 2} .0039604{col 37}{space 1}   -0.86{col 46}{space 3}0.392{col 54}{space 4}-.0111512{col 67}{space 3} .0043734
+{txt}{space 8}L4D. {c |}{col 14}{res}{space 2}-.0015059{col 26}{space 2} .0029942{col 37}{space 1}   -0.50{col 46}{space 3}0.615{col 54}{space 4}-.0073745{col 67}{space 3} .0043627
+{txt}{space 12} {c |}
+{space 4}scarring {c |}
+{space 9}D1. {c |}{col 14}{res}{space 2} -.055502{col 26}{space 2} .0055607{col 37}{space 1}   -9.98{col 46}{space 3}0.000{col 54}{space 4}-.0664007{col 67}{space 3}-.0446032
+{txt}{space 9}LD. {c |}{col 14}{res}{space 2} .0075148{col 26}{space 2} .0057052{col 37}{space 1}    1.32{col 46}{space 3}0.188{col 54}{space 4}-.0036672{col 67}{space 3} .0186969
+{txt}{space 8}L2D. {c |}{col 14}{res}{space 2}-.0677263{col 26}{space 2} .0055211{col 37}{space 1}  -12.27{col 46}{space 3}0.000{col 54}{space 4}-.0785475{col 67}{space 3}-.0569051
+{txt}{space 8}L3D. {c |}{col 14}{res}{space 2}  -.03138{col 26}{space 2} .0058014{col 37}{space 1}   -5.41{col 46}{space 3}0.000{col 54}{space 4}-.0427505{col 67}{space 3}-.0200094
+{txt}{space 8}L4D. {c |}{col 14}{res}{space 2} .0467985{col 26}{space 2} .0057516{col 37}{space 1}    8.14{col 46}{space 3}0.000{col 54}{space 4} .0355256{col 67}{space 3} .0580714
+{txt}{space 12} {c |}
+{space 7}_cons {c |}{col 14}{res}{space 2} .2016634{col 26}{space 2} .1041401{col 37}{space 1}    1.94{col 46}{space 3}0.053{col 54}{space 4}-.0024474{col 67}{space 3} .4057742
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+
+{com}. predict yhat_dfe_sc, xb
+{txt}(408 missing values generated)
+
+{com}. gen e_dfe_sc = $y2 - yhat_dfe_sc  
+{txt}(408 missing values generated)
+
+{com}. outreg2 using "$reg/$master.$format", append addtext(DFE, Scarring) label
+{txt}{browse `"C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.xls"'}
+{browse `"C:\Users\imedk\github\nitelite2\stata\Do"' :dir}{com} : {txt}{stata `"seeout using "C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.txt", label"':seeout}
+
+{com}. 
+. *------ MG -----*
+. xtdcce2 d.$y2 d.L(1/4).$y2 d.$x2 d.L(1/4).$x2, ///
+>       lr(L.$y2 $x2) nocrosssectional
+{res}{txt}(Dynamic) Common Correlated Effects Estimator - Mean Group (CS-ECM)
+
+Panel Variable (i): {res}prov{col 50}{txt}Number of obs{col 68}={col 71}{res}     1598
+{txt}Time Variable (t): {res}period_num{txt}{col 50}Number of groups{col 68}={col 71}{res}       34
+
+{txt}Degrees of freedom per group:{col 50}Obs per group:{col 68}
+{col 2}without cross-sectional avg.{col 31}min{col 37}={col 39}35{col 64}min = {col 71}{res}       47
+{txt}{col 31}max{col 37}={col 39}35{col 64}avg = {col 71}{res}       47
+{txt}{col 2}with cross-sectional avg.{col 31}min{col 37}={col 39}35{col 64}max = {col 71}{res}       47
+{txt}{col 31}max{col 37}={col 39}35
+Number of {col 50}F(408, 1190){col 68}={col 71}{res}    11.80
+{txt}{col 2}cross-sectional lags{col 37}none{col 50}Prob > F{col 68}={col 71}{res}     0.00
+{txt}{col 2}variables in mean group regression{col 37}={col 39}374{col 50}R-squared{col 68}={col 71}{res}     0.20
+{txt}{col 2}variables partialled out{col 37}={col 39}34{col 50}R-squared (MG){col 68}={col 71}{res}     0.74
+{txt}{col 50}Root MSE{col 68}={col 71}{res}     0.03
+{col 50}{txt}CD Statistic{col 68}={col 71}{res}    82.63
+{col 50}{txt}   p-value{col 68}={col 71}{res}   0.0000
+{txt}{hline 15}{c TT}{hline 63}
+      D.ln_pdrb{c |}{col 22}Coef.{col 30}Std. Err.{col 45}z{col 50}P>|z|{col 60}[95% Conf. Interval]
+{hline 15}{c +}{hline 63}
+{col 2}{col 2}Short Run Est.{col 15}{c |}
+{hline 15}{c +}{hline 63}
+{col 2}  Mean Group:{col 15} {c |}
+     LD.ln_pdrb{c |}{res}{col 18}-.6201249{col 29} .0348509{col 40}-17.79{col 50}0.000{col 60}-.6884313{col 71}-.5518184
+    {txt}L2D.ln_pdrb{c |}{res}{col 18} -.597133{col 29} .0331948{col 40}-17.99{col 50}0.000{col 60}-.6621937{col 71}-.5320723
+    {txt}L3D.ln_pdrb{c |}{res}{col 18}-.5463208{col 29} .0400064{col 40}-13.66{col 50}0.000{col 60}-.6247319{col 71}-.4679097
+    {txt}L4D.ln_pdrb{c |}{res}{col 18} .1985515{col 29}  .030613{col 40}  6.49{col 50}0.000{col 60} .1385511{col 71}  .258552
+       {txt}D.ln_ntl{c |}{res}{col 18}-.0025387{col 29} .0084072{col 40} -0.30{col 50}0.763{col 60}-.0190164{col 71}  .013939
+      {txt}LD.ln_ntl{c |}{res}{col 18}-.0097759{col 29} .0082056{col 40} -1.19{col 50}0.234{col 60}-.0258585{col 71} .0063067
+     {txt}L2D.ln_ntl{c |}{res}{col 18} .0053183{col 29} .0076787{col 40}  0.69{col 50}0.489{col 60}-.0097316{col 71} .0203683
+     {txt}L3D.ln_ntl{c |}{res}{col 18}-.0023493{col 29} .0062778{col 40} -0.37{col 50}0.708{col 60}-.0146536{col 71} .0099549
+     {txt}L4D.ln_ntl{c |}{res}{col 18}  .000898{col 29} .0045449{col 40}  0.20{col 50}0.843{col 60}-.0080097{col 71} .0098058
+{txt}{hline 15}{c +}{hline 63}
+{col 2}Adjust. Term{col 15} {c |}
+{hline 15}{c +}{hline 63}
+{col 2}  Mean Group:{col 15} {c |}
+      L.ln_pdrb{c |}{res}{col 18}-.0908062{col 29} .0154397{col 40} -5.88{col 50}0.000{col 60}-.1210674{col 71} -.060545
+{txt}{hline 15}{c +}{hline 63}
+{col 2}Long Run Est.{col 15} {c |}
+{hline 15}{c +}{hline 63}
+{col 2}  Mean Group:{col 15} {c |}
+         ln_ntl{c |}{res}{col 18} .4858281{col 29} .1554822{col 40}  3.12{col 50}0.002{col 60} .1810886{col 71} .7905676
+{txt}{hline 15}{c BT}{hline 63}
+Mean Group Variables: LD.ln_pdrb L2D.ln_pdrb L3D.ln_pdrb L4D.ln_pdrb D.ln_ntl LD.ln_ntl L2D.ln_ntl L3D.ln_ntl L4D.ln_ntl
+Long Run Variables:  ln_ntl
+Cointegration variable(s): L.ln_pdrb
+Heterogenous constant partialled out. 
+{res}{txt}
+{com}. estimates store mg_base
+{txt}
+{com}. predict yhat_mg, xb
+Constant partialled out and not part of yhat_mg.
+{txt}
+{com}. gen e_mg = $y2 - yhat_mg
+{txt}(578 missing values generated)
+
+{com}. outreg2 using "$reg/$master.$format", append addtext(MG, Plain) label
+{txt}{browse `"C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.xls"'}
+{browse `"C:\Users\imedk\github\nitelite2\stata\Do"' :dir}{com} : {txt}{stata `"seeout using "C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.txt", label"':seeout}
+
+{com}. 
+. xtdcce2 d.$y2 d.L(1/4).$y2 d.$x2 d.L(1/4).$x2 ///
+>       d.$co d.L(1/4).$co, ///
+>       lr(L.$y2 $x2 $co) nocrosssectional
+{res}{txt}(Dynamic) Common Correlated Effects Estimator - Mean Group (CS-ECM)
+
+Panel Variable (i): {res}prov{col 50}{txt}Number of obs{col 68}={col 71}{res}     1598
+{txt}Time Variable (t): {res}period_num{txt}{col 50}Number of groups{col 68}={col 71}{res}       34
+
+{txt}Degrees of freedom per group:{col 50}Obs per group:{col 68}
+{col 2}without cross-sectional avg.{col 31}min{col 37}={col 39}29{col 64}min = {col 71}{res}       47
+{txt}{col 31}max{col 37}={col 39}29{col 64}avg = {col 71}{res}       47
+{txt}{col 2}with cross-sectional avg.{col 31}min{col 37}={col 39}29{col 64}max = {col 71}{res}       47
+{txt}{col 31}max{col 37}={col 39}29
+Number of {col 50}F(612, 986){col 68}={col 71}{res}     9.55
+{txt}{col 2}cross-sectional lags{col 37}none{col 50}Prob > F{col 68}={col 71}{res}     0.00
+{txt}{col 2}variables in mean group regression{col 37}={col 39}578{col 50}R-squared{col 68}={col 71}{res}     0.14
+{txt}{col 2}variables partialled out{col 37}={col 39}34{col 50}R-squared (MG){col 68}={col 71}{res}     0.77
+{txt}{col 50}Root MSE{col 68}={col 71}{res}     0.03
+{col 50}{txt}CD Statistic{col 68}={col 71}{res}    80.66
+{col 50}{txt}   p-value{col 68}={col 71}{res}   0.0000
+{txt}{hline 15}{c TT}{hline 63}
+      D.ln_pdrb{c |}{col 22}Coef.{col 30}Std. Err.{col 45}z{col 50}P>|z|{col 60}[95% Conf. Interval]
+{hline 15}{c +}{hline 63}
+{col 2}{col 2}Short Run Est.{col 15}{c |}
+{hline 15}{c +}{hline 63}
+{col 2}  Mean Group:{col 15} {c |}
+     LD.ln_pdrb{c |}{res}{col 18}-.8270921{col 29} .0472148{col 40}-17.52{col 50}0.000{col 60}-.9196314{col 71}-.7345528
+    {txt}L2D.ln_pdrb{c |}{res}{col 18} -.825754{col 29} .0453949{col 40}-18.19{col 50}0.000{col 60}-.9147264{col 71}-.7367816
+    {txt}L3D.ln_pdrb{c |}{res}{col 18}-.7553478{col 29}  .050018{col 40}-15.10{col 50}0.000{col 60}-.8533813{col 71}-.6573142
+    {txt}L4D.ln_pdrb{c |}{res}{col 18} .0225942{col 29} .0301588{col 40}  0.75{col 50}0.454{col 60}-.0365159{col 71} .0817042
+       {txt}D.ln_ntl{c |}{res}{col 18} .0143064{col 29} .0088203{col 40}  1.62{col 50}0.105{col 60} -.002981{col 71} .0315938
+      {txt}LD.ln_ntl{c |}{res}{col 18} .0031806{col 29} .0078052{col 40}  0.41{col 50}0.684{col 60}-.0121173{col 71} .0184786
+     {txt}L2D.ln_ntl{c |}{res}{col 18} .0086473{col 29} .0068996{col 40}  1.25{col 50}0.210{col 60}-.0048757{col 71} .0221702
+     {txt}L3D.ln_ntl{c |}{res}{col 18}-.0057243{col 29} .0067726{col 40} -0.85{col 50}0.398{col 60}-.0189984{col 71} .0075498
+     {txt}L4D.ln_ntl{c |}{res}{col 18}-.0010629{col 29} .0044542{col 40} -0.24{col 50}0.811{col 60} -.009793{col 71} .0076672
+        {txt}D.covid{c |}{res}{col 18}-.0353924{col 29} .0025948{col 40}-13.64{col 50}0.000{col 60}-.0404781{col 71}-.0303067
+       {txt}LD.covid{c |}{res}{col 18}-.0066377{col 29} .0034748{col 40} -1.91{col 50}0.056{col 60}-.0134482{col 71} .0001728
+      {txt}L2D.covid{c |}{res}{col 18}-.0392355{col 29} .0038448{col 40}-10.20{col 50}0.000{col 60}-.0467712{col 71}-.0316999
+      {txt}L3D.covid{c |}{res}{col 18}-.0311964{col 29} .0034879{col 40} -8.94{col 50}0.000{col 60}-.0380326{col 71}-.0243602
+      {txt}L4D.covid{c |}{res}{col 18} .0030976{col 29} .0036173{col 40}  0.86{col 50}0.392{col 60}-.0039921{col 71} .0101873
+{txt}{hline 15}{c +}{hline 63}
+{col 2}Adjust. Term{col 15} {c |}
+{hline 15}{c +}{hline 63}
+{col 2}  Mean Group:{col 15} {c |}
+      L.ln_pdrb{c |}{res}{col 18}-.0456614{col 29}  .013388{col 40} -3.41{col 50}0.001{col 60}-.0719015{col 71}-.0194213
+{txt}{hline 15}{c +}{hline 63}
+{col 2}Long Run Est.{col 15} {c |}
+{hline 15}{c +}{hline 63}
+{col 2}  Mean Group:{col 15} {c |}
+         ln_ntl{c |}{res}{col 18} .1953108{col 29} .3343969{col 40}  0.58{col 50}0.559{col 60}-.4600951{col 71} .8507167
+          {txt}covid{c |}{res}{col 18} .0311381{col 29} .1646554{col 40}  0.19{col 50}0.850{col 60}-.2915805{col 71} .3538567
+{txt}{hline 15}{c BT}{hline 63}
+Mean Group Variables: LD.ln_pdrb L2D.ln_pdrb L3D.ln_pdrb L4D.ln_pdrb D.ln_ntl LD.ln_ntl L2D.ln_ntl L3D.ln_ntl L4D.ln_ntl D.covid LD.covid L2D.covid L3D.covid L4D.covid
+Long Run Variables:  ln_ntl covid
+Cointegration variable(s): L.ln_pdrb
+Heterogenous constant partialled out. 
+{res}{txt}
+{com}. estimates store mg_covid
+{txt}
+{com}. predict yhat_mg_co, xb
+Constant partialled out and not part of yhat_mg_co.
+{txt}
+{com}. gen e_mg_co = $y2 - yhat_mg_co
+{txt}(578 missing values generated)
+
+{com}. outreg2 using "$reg/$master.$format", append addtext(MG, Covid) label
+{txt}{browse `"C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.xls"'}
+{browse `"C:\Users\imedk\github\nitelite2\stata\Do"' :dir}{com} : {txt}{stata `"seeout using "C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.txt", label"':seeout}
+
+{com}. 
+. xtdcce2 d.$y2 d.L(1/4).$y2 d.$x2 d.L(1/4).$x2 ///
+>       d.$sc d.L(1/4).$sc, ///
+>       lr(L.$y2 $x2 $sc) nocrosssectional
+{res}{txt}(Dynamic) Common Correlated Effects Estimator - Mean Group (CS-ECM)
+
+Panel Variable (i): {res}prov{col 50}{txt}Number of obs{col 68}={col 71}{res}     1598
+{txt}Time Variable (t): {res}period_num{txt}{col 50}Number of groups{col 68}={col 71}{res}       34
+
+{txt}Degrees of freedom per group:{col 50}Obs per group:{col 68}
+{col 2}without cross-sectional avg.{col 31}min{col 37}={col 39}29{col 64}min = {col 71}{res}       47
+{txt}{col 31}max{col 37}={col 39}29{col 64}avg = {col 71}{res}       47
+{txt}{col 2}with cross-sectional avg.{col 31}min{col 37}={col 39}29{col 64}max = {col 71}{res}       47
+{txt}{col 31}max{col 37}={col 39}29
+Number of {col 50}F(612, 986){col 68}={col 71}{res}    12.77
+{txt}{col 2}cross-sectional lags{col 37}none{col 50}Prob > F{col 68}={col 71}{res}     0.00
+{txt}{col 2}variables in mean group regression{col 37}={col 39}578{col 50}R-squared{col 68}={col 71}{res}     0.11
+{txt}{col 2}variables partialled out{col 37}={col 39}34{col 50}R-squared (MG){col 68}={col 71}{res}     0.82
+{txt}{col 50}Root MSE{col 68}={col 71}{res}     0.03
+{col 50}{txt}CD Statistic{col 68}={col 71}{res}    47.57
+{col 50}{txt}   p-value{col 68}={col 71}{res}   0.0000
+{txt}{hline 15}{c TT}{hline 63}
+      D.ln_pdrb{c |}{col 22}Coef.{col 30}Std. Err.{col 45}z{col 50}P>|z|{col 60}[95% Conf. Interval]
+{hline 15}{c +}{hline 63}
+{col 2}{col 2}Short Run Est.{col 15}{c |}
+{hline 15}{c +}{hline 63}
+{col 2}  Mean Group:{col 15} {c |}
+     LD.ln_pdrb{c |}{res}{col 18} -1.02941{col 29} .0623304{col 40}-16.52{col 50}0.000{col 60}-1.151575{col 71}-.9072448
+    {txt}L2D.ln_pdrb{c |}{res}{col 18}-1.013869{col 29} .0633198{col 40}-16.01{col 50}0.000{col 60}-1.137973{col 71}-.8897642
+    {txt}L3D.ln_pdrb{c |}{res}{col 18}-.9630754{col 29} .0668936{col 40}-14.40{col 50}0.000{col 60}-1.094184{col 71}-.8319663
+    {txt}L4D.ln_pdrb{c |}{res}{col 18}-.1025064{col 29} .0526787{col 40} -1.95{col 50}0.052{col 60}-.2057548{col 71}  .000742
+       {txt}D.ln_ntl{c |}{res}{col 18} -.002714{col 29} .0091045{col 40} -0.30{col 50}0.766{col 60}-.0205584{col 71} .0151305
+      {txt}LD.ln_ntl{c |}{res}{col 18}-.0067092{col 29} .0100508{col 40} -0.67{col 50}0.504{col 60}-.0264084{col 71} .0129901
+     {txt}L2D.ln_ntl{c |}{res}{col 18} .0026964{col 29} .0082418{col 40}  0.33{col 50}0.744{col 60}-.0134573{col 71} .0188501
+     {txt}L3D.ln_ntl{c |}{res}{col 18}-.0029919{col 29} .0079361{col 40} -0.38{col 50}0.706{col 60}-.0185463{col 71} .0125625
+     {txt}L4D.ln_ntl{c |}{res}{col 18}-.0002891{col 29} .0044519{col 40} -0.06{col 50}0.948{col 60}-.0090146{col 71} .0084364
+     {txt}D.scarring{c |}{res}{col 18}-.0559909{col 29} .0049141{col 40}-11.39{col 50}0.000{col 60}-.0656224{col 71}-.0463595
+    {txt}LD.scarring{c |}{res}{col 18}-.0229513{col 29} .0072965{col 40} -3.15{col 50}0.002{col 60}-.0372522{col 71}-.0086503
+   {txt}L2D.scarring{c |}{res}{col 18}-.0748282{col 29} .0064201{col 40}-11.66{col 50}0.000{col 60}-.0874115{col 71} -.062245
+   {txt}L3D.scarring{c |}{res}{col 18}-.0769877{col 29} .0093992{col 40} -8.19{col 50}0.000{col 60}-.0954097{col 71}-.0585656
+   {txt}L4D.scarring{c |}{res}{col 18} .0060982{col 29} .0060711{col 40}  1.00{col 50}0.315{col 60}-.0058008{col 71} .0179973
+{txt}{hline 15}{c +}{hline 63}
+{col 2}Adjust. Term{col 15} {c |}
+{hline 15}{c +}{hline 63}
+{col 2}  Mean Group:{col 15} {c |}
+      L.ln_pdrb{c |}{res}{col 18} -.039504{col 29} .0179445{col 40} -2.20{col 50}0.028{col 60}-.0746745{col 71}-.0043335
+{txt}{hline 15}{c +}{hline 63}
+{col 2}Long Run Est.{col 15} {c |}
+{hline 15}{c +}{hline 63}
+{col 2}  Mean Group:{col 15} {c |}
+         ln_ntl{c |}{res}{col 18}-.7130685{col 29} 1.098445{col 40} -0.65{col 50}0.516{col 60} -2.86598{col 71} 1.439843
+       {txt}scarring{c |}{res}{col 18}-.0128059{col 29} .1209538{col 40} -0.11{col 50}0.916{col 60} -.249871{col 71} .2242591
+{txt}{hline 15}{c BT}{hline 63}
+Mean Group Variables: LD.ln_pdrb L2D.ln_pdrb L3D.ln_pdrb L4D.ln_pdrb D.ln_ntl LD.ln_ntl L2D.ln_ntl L3D.ln_ntl L4D.ln_ntl D.scarring LD.scarring L2D.scarring L3D.scarring L4D.scarring
+Long Run Variables:  ln_ntl scarring
+Cointegration variable(s): L.ln_pdrb
+Heterogenous constant partialled out. 
+{res}{txt}
+{com}. estimates store mg_scar
+{txt}
+{com}. predict yhat_mg_sc, xb
+Constant partialled out and not part of yhat_mg_sc.
+{txt}
+{com}. gen e_mg_sc = $y2 - yhat_mg_sc
+{txt}(578 missing values generated)
+
+{com}. outreg2 using "$reg/$master.$format", append addtext(MG, Scarring) label
+{txt}{browse `"C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.xls"'}
+{browse `"C:\Users\imedk\github\nitelite2\stata\Do"' :dir}{com} : {txt}{stata `"seeout using "C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.txt", label"':seeout}
+
+{com}. 
+. *----- PMG -----*
+. xtdcce2 d.$y2 d.L(1/4).$y2 d.$x2 d.L(1/4).$x2, ///
+>       lr(L.$y2 $x2) nocrosssectional pooled(L.$y2 $x2)
+{res}{txt}(Dynamic) Common Correlated Effects Estimator - Pooled Mean Group (CS-ECM)
+
+Panel Variable (i): {res}prov{col 50}{txt}Number of obs{col 68}={col 71}{res}     1598
+{txt}Time Variable (t): {res}period_num{txt}{col 50}Number of groups{col 68}={col 71}{res}       34
+
+{txt}Degrees of freedom per group:{col 50}Obs per group:{col 68}
+{col 2}without cross-sectional avg.{col 31}min{col 37}={col 39}35{col 64}min = {col 71}{res}       47
+{txt}{col 31}max{col 37}={col 39}35{col 64}avg = {col 71}{res}       47
+{txt}{col 2}with cross-sectional avg.{col 31}min{col 37}={col 39}35{col 64}max = {col 71}{res}       47
+{txt}{col 31}max{col 37}={col 39}35
+Number of {col 50}F(342, 1256){col 68}={col 71}{res}    13.89
+{txt}{col 2}cross-sectional lags{col 37}none{col 50}Prob > F{col 68}={col 71}{res}     0.00
+{txt}{col 2}variables in mean group regression{col 37}={col 39}308{col 50}R-squared{col 68}={col 71}{res}     0.21
+{txt}{col 2}variables partialled out{col 37}={col 39}34{col 50}Adj. R-squared{col 68}={col 71}{res}    -0.01
+{txt}{col 50}Root MSE{col 68}={col 71}{res}     0.03
+{col 50}{txt}CD Statistic{col 68}={col 71}{res}    82.21
+{col 50}{txt}   p-value{col 68}={col 71}{res}   0.0000
+{txt}{hline 15}{c TT}{hline 63}
+      D.ln_pdrb{c |}{col 22}Coef.{col 30}Std. Err.{col 45}z{col 50}P>|z|{col 60}[95% Conf. Interval]
+{hline 15}{c +}{hline 63}
+{col 2}{col 2}Short Run Est.{col 15}{c |}
+{hline 15}{c +}{hline 63}
+{col 2}  Mean Group:{col 15} {c |}
+     LD.ln_pdrb{c |}{res}{col 18}-.5783071{col 29}   .03385{col 40}-17.08{col 50}0.000{col 60}-.6446519{col 71}-.5119623
+    {txt}L2D.ln_pdrb{c |}{res}{col 18}-.5385398{col 29} .0313237{col 40}-17.19{col 50}0.000{col 60}-.5999331{col 71}-.4771465
+    {txt}L3D.ln_pdrb{c |}{res}{col 18}-.4725498{col 29} .0362936{col 40}-13.02{col 50}0.000{col 60}-.5436841{col 71}-.4014156
+    {txt}L4D.ln_pdrb{c |}{res}{col 18} .2777633{col 29} .0335445{col 40}  8.28{col 50}0.000{col 60} .2120172{col 71} .3435095
+       {txt}D.ln_ntl{c |}{res}{col 18} .0229224{col 29} .0065938{col 40}  3.48{col 50}0.001{col 60} .0099988{col 71} .0358459
+      {txt}LD.ln_ntl{c |}{res}{col 18} .0086692{col 29}  .005905{col 40}  1.47{col 50}0.142{col 60}-.0029044{col 71} .0202427
+     {txt}L2D.ln_ntl{c |}{res}{col 18} .0193329{col 29} .0061371{col 40}  3.15{col 50}0.002{col 60} .0073044{col 71} .0313614
+     {txt}L3D.ln_ntl{c |}{res}{col 18} .0057708{col 29} .0052429{col 40}  1.10{col 50}0.271{col 60} -.004505{col 71} .0160466
+     {txt}L4D.ln_ntl{c |}{res}{col 18} .0045321{col 29} .0042724{col 40}  1.06{col 50}0.289{col 60}-.0038416{col 71} .0129057
+{txt}{hline 15}{c +}{hline 63}
+{col 2}Adjust. Term{col 15} {c |}
+{hline 15}{c +}{hline 63}
+{col 2}  Pooled: {col 15} {c |}
+      L.ln_pdrb{c |}{res}{col 18}-.0417767{col 29} .3985821{col 40} -0.10{col 50}0.917{col 60}-.8229833{col 71} .7394299
+{txt}{hline 15}{c +}{hline 63}
+{col 2}Long Run Est.{col 15} {c |}
+{hline 15}{c +}{hline 63}
+{col 2}  Pooled:{col 15} {c |}
+         ln_ntl{c |}{res}{col 18} .3742474{col 29} .3794886{col 40}  0.99{col 50}0.324{col 60}-.3695367{col 71} 1.118031
+{txt}{hline 15}{c BT}{hline 63}
+Pooled Variables: L.ln_pdrb ln_ntl
+Mean Group Variables: LD.ln_pdrb L2D.ln_pdrb L3D.ln_pdrb L4D.ln_pdrb D.ln_ntl LD.ln_ntl L2D.ln_ntl L3D.ln_ntl L4D.ln_ntl
+Long Run Variables: ln_ntl 
+Cointegration variable(s): L.ln_pdrb
+Heterogenous constant partialled out. 
+{res}{txt}
+{com}. estimates store pmg_base
+{txt}
+{com}. predict yhat_pmg, xb
+Constant partialled out and not part of yhat_pmg.
+{txt}
+{com}. gen e_pmg = $y2 - yhat_pmg
+{txt}(578 missing values generated)
+
+{com}. outreg2 using "$reg/$master.$format", append addtext(PMG, Plain) label
+{txt}{browse `"C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.xls"'}
+{browse `"C:\Users\imedk\github\nitelite2\stata\Do"' :dir}{com} : {txt}{stata `"seeout using "C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.txt", label"':seeout}
+
+{com}. 
+. xtdcce2 d.$y2 d.L(1/4).$y2 d.$x2 d.L(1/4).$x2 ///
+>       d.$co d.L(1/4).$co, ///
+>       lr(L.$y2 $x2 $co) nocrosssectional pooled(L.$y2 $x2)
+{res}{txt}(Dynamic) Common Correlated Effects Estimator - Pooled Mean Group (CS-ECM)
+
+Panel Variable (i): {res}prov{col 50}{txt}Number of obs{col 68}={col 71}{res}     1598
+{txt}Time Variable (t): {res}period_num{txt}{col 50}Number of groups{col 68}={col 71}{res}       34
+
+{txt}Degrees of freedom per group:{col 50}Obs per group:{col 68}
+{col 2}without cross-sectional avg.{col 31}min{col 37}={col 39}29{col 64}min = {col 71}{res}       47
+{txt}{col 31}max{col 37}={col 39}29{col 64}avg = {col 71}{res}       47
+{txt}{col 2}with cross-sectional avg.{col 31}min{col 37}={col 39}29{col 64}max = {col 71}{res}       47
+{txt}{col 31}max{col 37}={col 39}29
+Number of {col 50}F(546, 1052){col 68}={col 71}{res}    10.66
+{txt}{col 2}cross-sectional lags{col 37}none{col 50}Prob > F{col 68}={col 71}{res}     0.00
+{txt}{col 2}variables in mean group regression{col 37}={col 39}512{col 50}R-squared{col 68}={col 71}{res}     0.15
+{txt}{col 2}variables partialled out{col 37}={col 39}34{col 50}Adj. R-squared{col 68}={col 71}{res}    -0.29
+{txt}{col 50}Root MSE{col 68}={col 71}{res}     0.03
+{col 50}{txt}CD Statistic{col 68}={col 71}{res}    78.72
+{col 50}{txt}   p-value{col 68}={col 71}{res}   0.0000
+{txt}{hline 15}{c TT}{hline 63}
+      D.ln_pdrb{c |}{col 22}Coef.{col 30}Std. Err.{col 45}z{col 50}P>|z|{col 60}[95% Conf. Interval]
+{hline 15}{c +}{hline 63}
+{col 2}{col 2}Short Run Est.{col 15}{c |}
+{hline 15}{c +}{hline 63}
+{col 2}  Mean Group:{col 15} {c |}
+     LD.ln_pdrb{c |}{res}{col 18}-.7582981{col 29} .0415469{col 40}-18.25{col 50}0.000{col 60}-.8397285{col 71}-.6768677
+    {txt}L2D.ln_pdrb{c |}{res}{col 18}-.7533673{col 29} .0401803{col 40}-18.75{col 50}0.000{col 60}-.8321193{col 71}-.6746154
+    {txt}L3D.ln_pdrb{c |}{res}{col 18}-.6832766{col 29} .0469044{col 40}-14.57{col 50}0.000{col 60}-.7752076{col 71}-.5913457
+    {txt}L4D.ln_pdrb{c |}{res}{col 18} .0891758{col 29} .0345855{col 40}  2.58{col 50}0.010{col 60} .0213896{col 71} .1569621
+       {txt}D.ln_ntl{c |}{res}{col 18} .0130976{col 29} .0053303{col 40}  2.46{col 50}0.014{col 60} .0026503{col 71} .0235449
+      {txt}LD.ln_ntl{c |}{res}{col 18} .0024444{col 29} .0055798{col 40}  0.44{col 50}0.661{col 60}-.0084918{col 71} .0133807
+     {txt}L2D.ln_ntl{c |}{res}{col 18} .0082712{col 29} .0048686{col 40}  1.70{col 50}0.089{col 60}-.0012711{col 71} .0178136
+     {txt}L3D.ln_ntl{c |}{res}{col 18}-.0066782{col 29} .0054641{col 40} -1.22{col 50}0.222{col 60}-.0173877{col 71} .0040312
+     {txt}L4D.ln_ntl{c |}{res}{col 18}-.0014493{col 29} .0041031{col 40} -0.35{col 50}0.724{col 60}-.0094913{col 71} .0065927
+        {txt}D.covid{c |}{res}{col 18}-.0334809{col 29}  .002146{col 40}-15.60{col 50}0.000{col 60}-.0376869{col 71}-.0292749
+       {txt}LD.covid{c |}{res}{col 18}-.0024761{col 29} .0038541{col 40} -0.64{col 50}0.521{col 60}  -.01003{col 71} .0050778
+      {txt}L2D.covid{c |}{res}{col 18}-.0367545{col 29} .0035323{col 40}-10.41{col 50}0.000{col 60}-.0436777{col 71}-.0298314
+      {txt}L3D.covid{c |}{res}{col 18}-.0264327{col 29} .0033756{col 40} -7.83{col 50}0.000{col 60}-.0330488{col 71}-.0198166
+      {txt}L4D.covid{c |}{res}{col 18} .0069643{col 29} .0045955{col 40}  1.52{col 50}0.130{col 60}-.0020427{col 71} .0159713
+{txt}{hline 15}{c +}{hline 63}
+{col 2}Adjust. Term{col 15} {c |}
+{hline 15}{c +}{hline 63}
+{col 2}  Pooled: {col 15} {c |}
+      L.ln_pdrb{c |}{res}{col 18}-.0441026{col 29} .2543499{col 40} -0.17{col 50}0.862{col 60}-.5426192{col 71} .4544141
+{txt}{hline 15}{c +}{hline 63}
+{col 2}Long Run Est.{col 15} {c |}
+{hline 15}{c +}{hline 63}
+{col 2}  Pooled:{col 15} {c |}
+         ln_ntl{c |}{res}{col 18} .1319395{col 29} .2815541{col 40}  0.47{col 50}0.639{col 60}-.4198965{col 71} .6837755
+{txt}{col 2}  Mean Group:{col 15} {c |}
+          covid{c |}{res}{col 18}-.1202801{col 29} .0847198{col 40} -1.42{col 50}0.156{col 60}-.2863279{col 71} .0457676
+{txt}{hline 15}{c BT}{hline 63}
+Pooled Variables: L.ln_pdrb ln_ntl
+Mean Group Variables: LD.ln_pdrb L2D.ln_pdrb L3D.ln_pdrb L4D.ln_pdrb D.ln_ntl LD.ln_ntl L2D.ln_ntl L3D.ln_ntl L4D.ln_ntl D.covid LD.covid L2D.covid L3D.covid L4D.covid
+Long Run Variables: ln_ntl covid
+Cointegration variable(s): L.ln_pdrb
+Heterogenous constant partialled out. 
+{res}{txt}
+{com}. estimates store pmg_covid
+{txt}
+{com}. predict yhat_pmg_co, xb
+Constant partialled out and not part of yhat_pmg_co.
+{txt}
+{com}. gen e_pmg_co = $y2 - yhat_pmg_co
+{txt}(578 missing values generated)
+
+{com}. outreg2 using "$reg/$master.$format", append addtext(PMG, Covid) label
+{txt}{browse `"C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.xls"'}
+{browse `"C:\Users\imedk\github\nitelite2\stata\Do"' :dir}{com} : {txt}{stata `"seeout using "C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.txt", label"':seeout}
+
+{com}. 
+. xtdcce2 d.$y2 d.L(1/4).$y2 d.$x2 d.L(1/4).$x2 ///
+>       d.$sc d.L(1/4).$sc, ///
+>       lr(L.$y2 $x2 $sc) nocrosssectional pooled(L.$y2 $x2)
+{res}{txt}(Dynamic) Common Correlated Effects Estimator - Pooled Mean Group (CS-ECM)
+
+Panel Variable (i): {res}prov{col 50}{txt}Number of obs{col 68}={col 71}{res}     1598
+{txt}Time Variable (t): {res}period_num{txt}{col 50}Number of groups{col 68}={col 71}{res}       34
+
+{txt}Degrees of freedom per group:{col 50}Obs per group:{col 68}
+{col 2}without cross-sectional avg.{col 31}min{col 37}={col 39}29{col 64}min = {col 71}{res}       47
+{txt}{col 31}max{col 37}={col 39}29{col 64}avg = {col 71}{res}       47
+{txt}{col 2}with cross-sectional avg.{col 31}min{col 37}={col 39}29{col 64}max = {col 71}{res}       47
+{txt}{col 31}max{col 37}={col 39}29
+Number of {col 50}F(546, 1052){col 68}={col 71}{res}    13.66
+{txt}{col 2}cross-sectional lags{col 37}none{col 50}Prob > F{col 68}={col 71}{res}     0.00
+{txt}{col 2}variables in mean group regression{col 37}={col 39}512{col 50}R-squared{col 68}={col 71}{res}     0.12
+{txt}{col 2}variables partialled out{col 37}={col 39}34{col 50}Adj. R-squared{col 68}={col 71}{res}    -0.33
+{txt}{col 50}Root MSE{col 68}={col 71}{res}     0.03
+{col 50}{txt}CD Statistic{col 68}={col 71}{res}    49.76
+{col 50}{txt}   p-value{col 68}={col 71}{res}   0.0000
+{txt}{hline 15}{c TT}{hline 63}
+      D.ln_pdrb{c |}{col 22}Coef.{col 30}Std. Err.{col 45}z{col 50}P>|z|{col 60}[95% Conf. Interval]
+{hline 15}{c +}{hline 63}
+{col 2}{col 2}Short Run Est.{col 15}{c |}
+{hline 15}{c +}{hline 63}
+{col 2}  Mean Group:{col 15} {c |}
+     LD.ln_pdrb{c |}{res}{col 18}-.9312894{col 29} .0636599{col 40}-14.63{col 50}0.000{col 60} -1.05606{col 71}-.8065183
+    {txt}L2D.ln_pdrb{c |}{res}{col 18}-.9081817{col 29} .0643605{col 40}-14.11{col 50}0.000{col 60}-1.034326{col 71}-.7820375
+    {txt}L3D.ln_pdrb{c |}{res}{col 18}-.8596409{col 29} .0677963{col 40}-12.68{col 50}0.000{col 60}-.9925191{col 71}-.7267627
+    {txt}L4D.ln_pdrb{c |}{res}{col 18}-.0134769{col 29} .0552062{col 40} -0.24{col 50}0.807{col 60}-.1216791{col 71} .0947254
+       {txt}D.ln_ntl{c |}{res}{col 18}-.0015032{col 29} .0041372{col 40} -0.36{col 50}0.716{col 60} -.009612{col 71} .0066057
+      {txt}LD.ln_ntl{c |}{res}{col 18}-.0082955{col 29} .0056861{col 40} -1.46{col 50}0.145{col 60}-.0194399{col 71}  .002849
+     {txt}L2D.ln_ntl{c |}{res}{col 18} .0017039{col 29}  .005506{col 40}  0.31{col 50}0.757{col 60}-.0090877{col 71} .0124955
+     {txt}L3D.ln_ntl{c |}{res}{col 18}-.0060222{col 29} .0064823{col 40} -0.93{col 50}0.353{col 60}-.0187274{col 71} .0066829
+     {txt}L4D.ln_ntl{c |}{res}{col 18}-.0018616{col 29} .0036315{col 40} -0.51{col 50}0.608{col 60}-.0089792{col 71} .0052559
+     {txt}D.scarring{c |}{res}{col 18}-.0601418{col 29} .0048377{col 40}-12.43{col 50}0.000{col 60}-.0696236{col 71}-.0506601
+    {txt}LD.scarring{c |}{res}{col 18}-.0187204{col 29}  .005604{col 40} -3.34{col 50}0.001{col 60} -.029704{col 71}-.0077368
+   {txt}L2D.scarring{c |}{res}{col 18}-.0752232{col 29} .0057102{col 40}-13.17{col 50}0.000{col 60} -.086415{col 71}-.0640313
+   {txt}L3D.scarring{c |}{res}{col 18}-.0719743{col 29} .0079869{col 40} -9.01{col 50}0.000{col 60}-.0876283{col 71}-.0563203
+   {txt}L4D.scarring{c |}{res}{col 18} .0109683{col 29} .0057545{col 40}  1.91{col 50}0.057{col 60}-.0003102{col 71} .0222468
+{txt}{hline 15}{c +}{hline 63}
+{col 2}Adjust. Term{col 15} {c |}
+{hline 15}{c +}{hline 63}
+{col 2}  Pooled: {col 15} {c |}
+      L.ln_pdrb{c |}{res}{col 18}-.0456825{col 29} .7193885{col 40} -0.06{col 50}0.949{col 60}-1.455658{col 71} 1.364293
+{txt}{hline 15}{c +}{hline 63}
+{col 2}Long Run Est.{col 15} {c |}
+{hline 15}{c +}{hline 63}
+{col 2}  Pooled:{col 15} {c |}
+         ln_ntl{c |}{res}{col 18} .4262308{col 29} 1.112973{col 40}  0.38{col 50}0.702{col 60}-1.755155{col 71} 2.607617
+{txt}{col 2}  Mean Group:{col 15} {c |}
+       scarring{c |}{res}{col 18} -.049038{col 29} .0734551{col 40} -0.67{col 50}0.504{col 60}-.1930073{col 71} .0949312
+{txt}{hline 15}{c BT}{hline 63}
+Pooled Variables: L.ln_pdrb ln_ntl
+Mean Group Variables: LD.ln_pdrb L2D.ln_pdrb L3D.ln_pdrb L4D.ln_pdrb D.ln_ntl LD.ln_ntl L2D.ln_ntl L3D.ln_ntl L4D.ln_ntl D.scarring LD.scarring L2D.scarring L3D.scarring L4D.scarring
+Long Run Variables: ln_ntl scarring
+Cointegration variable(s): L.ln_pdrb
+Heterogenous constant partialled out. 
+{res}{txt}
+{com}. estimates store pmg_scar
+{txt}
+{com}. predict yhat_pmg_sc, xb
+Constant partialled out and not part of yhat_pmg_sc.
+{txt}
+{com}. gen e_pmg_sc = $y2 - yhat_pmg_sc
+{txt}(578 missing values generated)
+
+{com}. outreg2 using "$reg/$master.$format", append addtext(PMG, Scarring) label
+{txt}{browse `"C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.xls"'}
+{browse `"C:\Users\imedk\github\nitelite2\stata\Do"' :dir}{com} : {txt}{stata `"seeout using "C:/Users/imedk/github/nitelite2/stata/reg/ntl_analysis_master.txt", label"':seeout}
+
+{com}. 
+. *-------------------------------------------------------------------------------
+. * Hausman test: PMG vs MG (long-run homogeneity restriction)
+. *-------------------------------------------------------------------------------
+. * H0: long-run coefficients are common across provinces (PMG efficient & consistent)
+. * H1: long-run coefficients differ across provinces (only MG consistent)
+. * Reject H0 ==> use MG; fail to reject ==> PMG preferred (more efficient).
+. * `sigmamore` enforces a common variance estimate, recommended when xtdcce2 posts
+. * heterogeneous covariance matrices.
+. 
+. display _newline as text "=== Hausman test: PMG vs MG, baseline ==="
+{res}
+{txt}=== Hausman test: PMG vs MG, baseline ===
+
+{com}. capture noisily hausman mg_base pmg_base, sigmamore
+
+{txt}{col 18}{hline 4} Coefficients {hline 4}
+{col 14}{c |}{col 21}(b){col 34}(B){col 49}(b-B){col 59}sqrt(diag(V_b-V_B))
+{col 14}{c |}{col 17}  mg_base   {col 30}  pmg_base  {col 46}Difference{col 63}Std. err.
+{hline 13}{c +}{hline 64}
+{space 5}ln_pdrb {c |}
+{space 9}LD. {c |}{res}{col 18}-.6201249{col 31}-.5783071{col 47}-.0418178{col 63} .0082618
+{txt}{space 8}L2D. {c |}{res}{col 18} -.597133{col 31}-.5385398{col 47}-.0585932{col 63} .0109667
+{txt}{space 8}L3D. {c |}{res}{col 18}-.5463208{col 31}-.4725498{col 47} -.073771{col 63} .0168113
+{txt}{space 8}L4D. {c |}{res}{col 18} .1985515{col 31} .2777633{col 47}-.0792118{col 63}        .
+{txt}{space 6}ln_ntl {c |}
+{space 9}D1. {c |}{res}{col 18}-.0025387{col 31} .0229224{col 47}-.0254611{col 63} .0052128
+{txt}{space 9}LD. {c |}{res}{col 18}-.0097759{col 31} .0086692{col 47} -.018445{col 63} .0056952
+{txt}{space 8}L2D. {c |}{res}{col 18} .0053183{col 31} .0193329{col 47}-.0140146{col 63} .0046124
+{txt}{space 8}L3D. {c |}{res}{col 18}-.0023493{col 31} .0057708{col 47}-.0081201{col 63} .0034506
+{txt}{space 8}L4D. {c |}{res}{col 18}  .000898{col 31} .0045321{col 47}-.0036341{col 63} .0015473
+{txt}{space 5}ln_pdrb {c |}
+{space 9}L1. {c |}{res}{col 18}-.0908062{col 31}-.0417767{col 47}-.0490295{col 63}        .
+{txt}{space 6}ln_ntl {c |}{res}{col 18} .4858281{col 31} .3742474{col 47} .1115807{col 63}        .
+{txt}{hline 13}{c BT}{hline 64}
+{ralign 78:b = Consistent under H0 and Ha; obtained from {bf:xtdcce2}.}
+{ralign 78:B = Inconsistent under Ha, efficient under H0; obtained from {bf:xtdcce2}.}
+
+Test of H0: Difference in coefficients not systematic
+
+{ralign 11:chi2({res:11})} = (b-B)'[(V_b-V_B)^(-1)](b-B)
+{ralign 11:} = {res:{ralign 6:13.70}}
+{ralign 11:Prob > chi2} = {res:{ralign 6:0.2498}}
+(V_b-V_B is not positive definite)
+
+{com}. if _rc {c -(}
+.     display as error "Standard hausman failed (rc=" _rc "); see manual fallback below"
+. {c )-}
+{txt}
+{com}. 
+. display _newline as text "=== Hausman test: PMG vs MG, +Covid ==="
+{res}
+{txt}=== Hausman test: PMG vs MG, +Covid ===
+
+{com}. capture noisily hausman mg_covid pmg_covid, sigmamore
+
+{txt}{col 18}{hline 4} Coefficients {hline 4}
+{col 14}{c |}{col 21}(b){col 34}(B){col 49}(b-B){col 59}sqrt(diag(V_b-V_B))
+{col 14}{c |}{col 17}  mg_covid  {col 30} pmg_covid  {col 46}Difference{col 63}Std. err.
+{hline 13}{c +}{hline 64}
+{space 5}ln_pdrb {c |}
+{space 9}LD. {c |}{res}{col 18}-.8270921{col 31}-.7582981{col 47} -.068794{col 63} .0221655
+{txt}{space 8}L2D. {c |}{res}{col 18} -.825754{col 31}-.7533673{col 47}-.0723867{col 63}  .020865
+{txt}{space 8}L3D. {c |}{res}{col 18}-.7553478{col 31}-.6832766{col 47}-.0720712{col 63} .0169869
+{txt}{space 8}L4D. {c |}{res}{col 18} .0225942{col 31} .0891758{col 47}-.0665817{col 63}        .
+{txt}{space 6}ln_ntl {c |}
+{space 9}D1. {c |}{res}{col 18} .0143064{col 31} .0130976{col 47} .0012088{col 63} .0069981
+{txt}{space 9}LD. {c |}{res}{col 18} .0031806{col 31} .0024444{col 47} .0007362{col 63} .0054282
+{txt}{space 8}L2D. {c |}{res}{col 18} .0086473{col 31} .0082712{col 47}  .000376{col 63} .0048631
+{txt}{space 8}L3D. {c |}{res}{col 18}-.0057243{col 31}-.0066782{col 47} .0009539{col 63} .0039711
+{txt}{space 8}L4D. {c |}{res}{col 18}-.0010629{col 31}-.0014493{col 47} .0003864{col 63} .0017028
+{txt}{space 7}covid {c |}
+{space 9}D1. {c |}{res}{col 18}-.0353924{col 31}-.0334809{col 47}-.0019114{col 63} .0014465
+{txt}{space 9}LD. {c |}{res}{col 18}-.0066377{col 31}-.0024761{col 47}-.0041616{col 63}        .
+{txt}{space 8}L2D. {c |}{res}{col 18}-.0392355{col 31}-.0367545{col 47} -.002481{col 63} .0014923
+{txt}{space 8}L3D. {c |}{res}{col 18}-.0311964{col 31}-.0264327{col 47}-.0047636{col 63} .0008405
+{txt}{space 8}L4D. {c |}{res}{col 18} .0030976{col 31} .0069643{col 47}-.0038667{col 63}        .
+{txt}{space 5}ln_pdrb {c |}
+{space 9}L1. {c |}{res}{col 18}-.0456614{col 31}-.0441026{col 47}-.0015588{col 63}        .
+{txt}{space 6}ln_ntl {c |}{res}{col 18} .1953108{col 31} .1319395{col 47} .0633713{col 63} .1787666
+{txt}{space 7}covid {c |}{res}{col 18} .0311381{col 31}-.1202801{col 47} .1514182{col 63} .1406792
+{txt}{hline 13}{c BT}{hline 64}
+{ralign 78:b = Consistent under H0 and Ha; obtained from {bf:xtdcce2}.}
+{ralign 78:B = Inconsistent under Ha, efficient under H0; obtained from {bf:xtdcce2}.}
+
+Test of H0: Difference in coefficients not systematic
+
+{ralign 11:chi2({res:17})} = (b-B)'[(V_b-V_B)^(-1)](b-B)
+{ralign 11:} = {res:{ralign 6:0.33}}
+{ralign 11:Prob > chi2} = {res:{ralign 6:1.0000}}
+(V_b-V_B is not positive definite)
+
+{com}. if _rc {c -(}
+.     display as error "Standard hausman failed (rc=" _rc "); see manual fallback below"
+. {c )-}
+{txt}
+{com}. 
+. display _newline as text "=== Hausman test: PMG vs MG, +Scarring ==="
+{res}
+{txt}=== Hausman test: PMG vs MG, +Scarring ===
+
+{com}. capture noisily hausman mg_scar pmg_scar, sigmamore
+
+{txt}{col 18}{hline 4} Coefficients {hline 4}
+{col 14}{c |}{col 21}(b){col 34}(B){col 49}(b-B){col 59}sqrt(diag(V_b-V_B))
+{col 14}{c |}{col 17}  mg_scar   {col 30}  pmg_scar  {col 46}Difference{col 63}Std. err.
+{hline 13}{c +}{hline 64}
+{space 5}ln_pdrb {c |}
+{space 9}LD. {c |}{res}{col 18} -1.02941{col 31}-.9312894{col 47}-.0981206{col 63}        .
+{txt}{space 8}L2D. {c |}{res}{col 18}-1.013869{col 31}-.9081817{col 47} -.105687{col 63} .0014008
+{txt}{space 8}L3D. {c |}{res}{col 18}-.9630754{col 31}-.8596409{col 47}-.1034345{col 63} .0053765
+{txt}{space 8}L4D. {c |}{res}{col 18}-.1025064{col 31}-.0134769{col 47}-.0890296{col 63}        .
+{txt}{space 6}ln_ntl {c |}
+{space 9}D1. {c |}{res}{col 18} -.002714{col 31}-.0015032{col 47}-.0012108{col 63} .0082802
+{txt}{space 9}LD. {c |}{res}{col 18}-.0067092{col 31}-.0082955{col 47} .0015863{col 63} .0084903
+{txt}{space 8}L2D. {c |}{res}{col 18} .0026964{col 31} .0017039{col 47} .0009925{col 63} .0063163
+{txt}{space 8}L3D. {c |}{res}{col 18}-.0029919{col 31}-.0060222{col 47} .0030303{col 63}  .004804
+{txt}{space 8}L4D. {c |}{res}{col 18}-.0002891{col 31}-.0018616{col 47} .0015725{col 63} .0027015
+{txt}{space 4}scarring {c |}
+{space 9}D1. {c |}{res}{col 18}-.0559909{col 31}-.0601418{col 47} .0041509{col 63} .0012478
+{txt}{space 9}LD. {c |}{res}{col 18}-.0229513{col 31}-.0187204{col 47}-.0042309{col 63} .0048606
+{txt}{space 8}L2D. {c |}{res}{col 18}-.0748282{col 31}-.0752232{col 47}  .000395{col 63} .0031619
+{txt}{space 8}L3D. {c |}{res}{col 18}-.0769877{col 31}-.0719743{col 47}-.0050134{col 63} .0052464
+{txt}{space 8}L4D. {c |}{res}{col 18} .0060982{col 31} .0109683{col 47}-.0048701{col 63} .0022324
+{txt}{space 5}ln_pdrb {c |}
+{space 9}L1. {c |}{res}{col 18} -.039504{col 31}-.0456825{col 47} .0061786{col 63}        .
+{txt}{space 6}ln_ntl {c |}{res}{col 18}-.7130685{col 31} .4262308{col 47}-1.139299{col 63} .0919192
+{txt}{space 4}scarring {c |}{res}{col 18}-.0128059{col 31} -.049038{col 47} .0362321{col 63} .0986213
+{txt}{hline 13}{c BT}{hline 64}
+{ralign 78:b = Consistent under H0 and Ha; obtained from {bf:xtdcce2}.}
+{ralign 78:B = Inconsistent under Ha, efficient under H0; obtained from {bf:xtdcce2}.}
+
+Test of H0: Difference in coefficients not systematic
+
+{ralign 11:chi2({res:17})} = (b-B)'[(V_b-V_B)^(-1)](b-B)
+{ralign 11:} = {res:{ralign 6:21.73}}
+{ralign 11:Prob > chi2} = {res:{ralign 6:0.1953}}
+(V_b-V_B is not positive definite)
+
+{com}. if _rc {c -(}
+.     display as error "Standard hausman failed (rc=" _rc "); see manual fallback below"
+. {c )-}
+{txt}
+{com}. 
+. * Manual quadratic-form fallback if `hausman` chokes on xtdcce2's e(V).
+. * Restrict the comparison to the long-run coefficient(s) of $x2 (and the relevant
+. * covid/scarring dummy where applicable). Adjust the column selectors to match
+. * the names xtdcce2 uses in e(b) for the long-run block (typically "lr_<varname>").
+. *
+. * Example for the baseline spec:
+. *   estimates restore mg_base
+. *   matrix b_mg  = e(b)
+. *   matrix V_mg  = e(V)
+. *   estimates restore pmg_base
+. *   matrix b_pmg = e(b)
+. *   matrix V_pmg = e(V)
+. *   matrix b_diff = b_mg - b_pmg
+. *   matrix V_diff = V_mg - V_pmg
+. *   scalar H = (b_diff * invsym(V_diff) * b_diff')[1,1]
+. *   scalar df = colsof(b_diff)
+. *   scalar p  = chi2tail(df, H)
+. *   display "Manual Hausman: chi2(" df ") = " H ", p = " p
+. 
+. 
+. sa "$output/ntl_gdrp.dta", replace
+{txt}{p 0 4 2}
+file {bf}
+C:/Users/imedk/github/nitelite2/stata/dat/ntl_gdrp.dta{rm}
+saved
+{p_end}
+
+{com}. export excel "$output/ntl_gdrp.xls",  firstrow(variables) replace
+{res}{txt}file {bf:C:/Users/imedk/github/nitelite2/stata/dat/ntl_gdrp.xls} saved
+
+{com}. 
+. 
+{txt}end of do-file
+
+{com}. log close
+      {txt}name:  {res}<unnamed>
+       {txt}log:  {res}C:\Users\imedk\github\nitelite2\stata\Do\lala.smcl
+  {txt}log type:  {res}smcl
+ {txt}closed on:  {res}14 Apr 2026, 15:18:42
+{txt}{.-}
+{smcl}
+{txt}{sf}{ul off}

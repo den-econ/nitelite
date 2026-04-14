@@ -1,0 +1,9 @@
+Variable,Coefficient
+const,15.4878***
+,(0.0561)
+ntlg,0.5401***
+,(0.0407)
+Observations,55
+R-squared,0.7683
+Adj. R-squared,0.7639
+F-statistic,175.76
