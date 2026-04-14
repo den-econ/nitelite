@@ -68,6 +68,11 @@ $if(keywords)$
 \keywords{$for(keywords)$$keywords$$sep$; $endfor$}
 $endif$
 
+% JEL classification codes
+$if(jel)$
+\jel{$for(jel)$$jel$$sep$, $endfor$}
+$endif$
+
 % Abbreviations
 $if(paper-abbreviations)$
 \abbreviations{
