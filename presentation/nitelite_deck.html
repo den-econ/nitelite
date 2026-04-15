@@ -12,7 +12,7 @@
   <meta name="author" content="Krisna Gupta">
   <meta name="author" content="Timothy Kinmekita Ginting">
   <meta name="author" content="Meizahra Afidatie">
-  <meta name="dcterms.date" content="2026-04-14">
+  <meta name="dcterms.date" content="2026-04-15">
   <title>Forecasting Indonesian National and Provincial GDP using Nighttime Light Index</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -51,7 +51,7 @@
     div.csl-indent {
       margin-left: 2em;
     }  </style>
-  <link rel="stylesheet" href="nitelite_deck_files/libs/revealjs/dist/theme/quarto-b8412eadc8a3c3b23b1449414811df9b.css">
+  <link rel="stylesheet" href="nitelite_deck_files/libs/revealjs/dist/theme/quarto-da2ef0aa3e11c9fb79c333cf6819a333.css">
   <link rel="stylesheet" href="_extensions/den/revealjs.scss">
   <link href="nitelite_deck_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="nitelite_deck_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
@@ -180,7 +180,7 @@ Meizahra Afidatie
     </div>
 </div>
 
-  <p class="date">14 April 2026</p>
+  <p class="date">15 April 2026</p>
 </section>
 <section id="why-measure-gdp-at-higher-frequency" class="slide level2 small">
 <h2>Why measure GDP at higher frequency?</h2>
@@ -191,15 +191,15 @@ Meizahra Afidatie
 <li>Because GDP is a political signal, there is an incentive to overestimate; <em>independent</em> validation is valuable.</li>
 </ul>
 <blockquote>
-<p><strong>Research question.</strong> Can nighttime lights — generated outside the statistical agency — serve as a credible proxy for Indonesian GDP growth, nationally and provincially?</p>
+<p>Can nighttime lights serve as a credible proxy for Indonesian GDP growth, nationally and provincially?</p>
 </blockquote>
 </section>
 <section id="why-nighttime-lights" class="slide level2">
 <h2>Why nighttime lights?</h2>
 <ul>
 <li>Satellite-based measure of light emitted from Earth at night: streetlights, buildings, vehicles, commercial activity.</li>
-<li>Literature: <span class="citation" data-cites="nl">Henderson, Storeygard, and Weil (<a href="#/section" role="doc-biblioref" onclick="">2012</a>)</span>, <span class="citation" data-cites="nl2">Bickenbach et al. (<a href="#/section" role="doc-biblioref" onclick="">2016</a>)</span>, <span class="citation" data-cites="nl3">Martínez (<a href="#/section" role="doc-biblioref" onclick="">2022</a>)</span> show NTL tracks economic activity globally, including for countries with weak statistical infrastructure.</li>
-<li><strong>Independent of BPS.</strong> Data pipeline from NASA’s Black Marble is reproducible and transparent.</li>
+<li>Literature: <span class="citation" data-cites="nl">Henderson, Storeygard, and Weil (<a href="#/references" role="doc-biblioref" onclick="">2012</a>)</span>, <span class="citation" data-cites="nl2">Bickenbach et al. (<a href="#/references" role="doc-biblioref" onclick="">2016</a>)</span>, <span class="citation" data-cites="nl3">Martínez (<a href="#/references" role="doc-biblioref" onclick="">2022</a>)</span> show NTL tracks economic activity globally, including for countries with weak statistical infrastructure.</li>
+<li>Data pipeline from NASA’s Black Marble is reproducible and transparent.</li>
 <li>High spatial resolution (500 m) — allows both national and provincial analysis.</li>
 <li>But: is it genuinely useful for <strong>Indonesia</strong>?</li>
 </ul>
@@ -207,10 +207,10 @@ Meizahra Afidatie
 <section id="data-nasa-black-marble-viirs" class="slide level2 small">
 <h2>Data: NASA Black Marble VIIRS</h2>
 <ul>
-<li>Source: NASA Black Marble Standard Product Suite, via <code>blackmarblepy</code> <span class="citation" data-cites="blackmarblepy">(<a href="#/section" role="doc-biblioref" onclick="">Stefanini Vicente and Marty 2023</a>)</span>.</li>
+<li>Source: NASA Black Marble Standard Product Suite, via <code>blackmarblepy</code> <span class="citation" data-cites="blackmarblepy">(<a href="#/references" role="doc-biblioref" onclick="">Stefanini Vicente and Marty 2023</a>)</span>.</li>
 <li>Daily radiance measurements, cloud-corrected and calibrated.</li>
-<li>We aggregate to <strong>monthly</strong> (Jan 2012 – Dec 2024) then to <strong>quarterly</strong> year-on-year log growth.</li>
-<li>GDP data from BPS quarterly real GDP series <span class="citation" data-cites="bps">(<a href="#/section" role="doc-biblioref" onclick="">BPS 2025</a>)</span>, matched by quarter.</li>
+<li>We aggregate to monthly (Jan 2012 – Dec 2024) then to quarterly year-on-year log growth.</li>
+<li>GDP data from BPS quarterly real GDP series <span class="citation" data-cites="bps">(<a href="#/references" role="doc-biblioref" onclick="">BPS 2025</a>)</span>, matched by quarter.</li>
 <li>Provincial GDRP from BPS for 34 provinces.</li>
 </ul>
 <aside class="notes">
@@ -227,23 +227,27 @@ Meizahra Afidatie
           display:block!important;
       }</style></aside>
 </section>
-<section id="indonesia-seen-from-space-2023" class="slide level2">
+<section id="indonesia-seen-from-space-2023" class="slide level2 small">
 <h2>Indonesia seen from space, 2023</h2>
-
-<img data-src="../fig/nitelite.png" style="width:70.0%" class="r-stretch quarto-figure-center"><p class="caption">Annual NTL in Indonesia, 2023</p><ul>
-<li>Java dominates.</li>
-<li>Stark contrast between Java and the rest of Indonesia — mirrors GDP distribution.</li>
+<div class="columns">
+<div class="column" style="width:65%;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="../fig/nitelite.png" style="width:100.0%"></p>
+<figcaption>Annual NTL in Indonesia, 2023</figcaption>
+</figure>
+</div>
+</div><div class="column" style="width:35%;">
+<ul>
+<li>Stark contrast between Java and the rest of Indonesia — mirrors GDP &amp; population distribution.</li>
 <li>Mining and palm-oil regions are visibly darker despite high economic output.</li>
 </ul>
+</div></div>
 </section>
 <section id="national-series" class="slide level2">
 <h2>National series</h2>
 
-<img data-src="../fig/figQ.png" style="width:90.0%" class="r-stretch quarto-figure-center"><p class="caption">Quarterly real GDP (left) and NTL index (right), 2012–2024</p><ul>
-<li>Both series trend upward; visually non-stationary.</li>
-<li><strong>NTL barely dips during COVID</strong> — a red flag we return to.</li>
-</ul>
-</section>
+<img data-src="../fig/figQ.png" style="width:90.0%" class="r-stretch quarto-figure-center"><p class="caption">Quarterly real GDP (left) and NTL index (right), 2012–2024</p></section>
 <section id="two-layers-of-analysis" class="slide level2">
 <h2>Two layers of analysis</h2>
 <div class="columns">
@@ -253,7 +257,7 @@ Meizahra Afidatie
 <li>Bivariate time-series.</li>
 <li>OLS → ARDL with lag selection by AIC.</li>
 <li>Six ARDL specifications around COVID/scarring/quarterly dummies.</li>
-<li>Train/test forecast (holdout = 2024+).</li>
+<li>Train/test forecast.</li>
 </ul>
 </div><div class="column" style="width:50%;">
 <p><strong>Provincial level</strong></p>
@@ -261,7 +265,6 @@ Meizahra Afidatie
 <li>Panel of 34 provinces × 47 quarters.</li>
 <li>Static: pooled OLS, FE, TWFE.</li>
 <li>Dynamic: DFE, PMG, MG (Pesaran–Shin–Smith).</li>
-<li>Tests provincial heterogeneity explicitly.</li>
 </ul>
 </div></div>
 </section>
@@ -362,17 +365,19 @@ Meizahra Afidatie
 
 <img data-src="../fig/Qols.png" style="width:85.0%" class="r-stretch quarto-figure-center"><p class="caption">OLS fit and residuals</p><ul>
 <li>OLS coefficient: 0.54*<strong>, but residuals are systematically biased: </strong>over-predicts pre-2017, under-predicts post-2017**.</li>
-<li>Residuals are clearly autocorrelated.</li>
-<li>Need a dynamic specification → ARDL.</li>
 </ul>
 </section>
 <section id="national-six-ardl-specifications" class="slide level2">
 <h2>National: six ARDL specifications</h2>
-
-<img data-src="../fig/ARDLQ.png" style="width:80.0%" class="r-stretch quarto-figure-center"><p class="caption">ARDL fits across six specifications</p><ol type="a">
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><img data-src="../fig/ARDLQ.png" style="width:80.0%"></p>
+</div><div class="column" style="width:50%;">
+<ol type="a">
 <li>baseline (b) +Covid (c) +Scarring (d) +Quarterly (e) +Q+C (f) +Q+S.</li>
 </ol>
 <p>Specifications with the scarring dummy — panels (c) and (f) — produce the tightest fits.</p>
+</div></div>
 </section>
 <section id="reading-the-ardl-table" class="slide level2 small">
 <h2>Reading the ARDL table</h2>
@@ -401,14 +406,23 @@ Meizahra Afidatie
 <li>Read as <strong>suggestive</strong>, not a precise estimate of pandemic damage.</li>
 </ul>
 </section>
-<section id="out-of-sample-forecast" class="slide level2">
+<section id="out-of-sample-forecast" class="slide level2 small">
 <h2>Out-of-sample forecast</h2>
-
-<img data-src="../fig/ARDL_train_test_forecast.png" style="width:80.0%" class="r-stretch quarto-figure-center"><p class="caption">ARDL train/test split: hold-out 2024+</p><ul>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="../fig/ARDL_train_test_forecast.png" style="width:80.0%"></p>
+<figcaption>ARDL train/test split: hold-out 2024+</figcaption>
+</figure>
+</div>
+</div><div class="column" style="width:50%;">
+<ul>
 <li>+Scar and +Q+S produce the smallest MAE/RMSE.</li>
 <li>But: hold-out window is <strong>only 4–6 quarters</strong>. Too short to make strong forecast-quality claims.</li>
 <li>Rolling/recursive evaluation is future work.</li>
 </ul>
+</div></div>
 </section>
 <section id="provincial-static-models" class="slide level2 small">
 <h2>Provincial: static models</h2>
@@ -442,15 +456,23 @@ Meizahra Afidatie
 <li><strong>TWFE = 0.055</strong> is the most informative: within a province, controlling for common time shocks, NTL has little marginal predictive power.</li>
 </ul>
 </section>
-<section id="provincial-cross-section" class="slide level2">
+<section id="provincial-cross-section" class="slide level2 small">
 <h2>Provincial cross-section</h2>
-
-<img data-src="../stata/fig/scatter_ntl.png" style="width:70.0%" class="r-stretch quarto-figure-center"><p class="caption">NTL vs GDRP across 34 provinces</p><ul>
+<div class="columns">
+<div class="column" style="width:65%;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="../stata/fig/scatter_ntl.png" style="width:100.0%"></p>
+<figcaption>NTL vs GDRP across 34 provinces</figcaption>
+</figure>
+</div>
+</div><div class="column" style="width:35%;">
+<ul>
 <li>Java clusters high on both axes.</li>
-<li>Resource provinces (Kalimantan, Papua) generate output without light.</li>
-<li>Agricultural provinces sit somewhere in between.</li>
+<li>Resource provinces generate lightless output, Agricultural provinces sit somewhere in between.</li>
 <li>The NTL–GDRP <em>slope</em> plausibly differs across island groups.</li>
 </ul>
+</div></div>
 </section>
 <section id="provincial-dynamic-estimators" class="slide level2 small">
 <h2>Provincial: dynamic estimators</h2>
@@ -518,6 +540,7 @@ Meizahra Afidatie
 <li>Tempting interpretation: <strong>hysteresis</strong> — the pandemic permanently slowed recovery.</li>
 <li>But: adding a scarring dummy mechanically <em>redefines</em> equilibrium, so part of the ECT drop is a specification artefact.</li>
 <li>We flag this as consistent with hysteresis, not a causal identification.</li>
+<li>Separating observation costs number of observations.</li>
 </ul>
 </section>
 <section id="what-we-find" class="slide level2">
@@ -549,33 +572,22 @@ Meizahra Afidatie
 </ol>
 <p>Useful, but not a magic wand.</p>
 </section>
-<section id="limitations-future-work" class="slide level2 small">
-<h2>Limitations &amp; future work</h2>
-<ul>
-<li><strong>Sample size</strong>: 51 quarterly observations is tight for ARDL+Scar dfs.</li>
-<li><strong>Short OOS window</strong>: rolling-origin forecasts needed.</li>
-<li><strong>Formal bounds test</strong> (Pesaran–Shin–Smith) not reported — to be added.</li>
-<li><strong>Scarring identification</strong>: try dummies starting 2022Q1 or 2023Q1; ECM reformulation.</li>
-<li><strong>Provincial heterogeneity</strong>: interact NTL with province characteristics; cluster-wise elasticity by island group.</li>
-<li><strong>COVID-period divergence</strong>: pair NTL with electricity dispatch, mobility, fiscal flow data.</li>
-</ul>
-</section>
 <section id="thank-you" class="slide level2">
 <h2>Thank you</h2>
 <p>Paper and reproducibility repo:</p>
 <div class="small">
 <ul>
-<li>Main paper: <a href="https://github.com/imedkrisna/nitelite">github.com/imedkrisna/nitelite</a></li>
+<li>Main paper: <a href="https://github.com/den-econ/nitelite">github.com/den-econ/nitelite</a></li>
 <li>Python pipeline (national): <code>appendix.ipynb</code></li>
 <li>Stata pipeline (provincial): <code>stata/Do/Nighttime Light_Reg.do</code></li>
-<li>Data: NASA Black Marble <span class="citation" data-cites="blackmarblepy">(<a href="#/section" role="doc-biblioref" onclick="">Stefanini Vicente and Marty 2023</a>)</span>, BPS <span class="citation" data-cites="bps">(<a href="#/section" role="doc-biblioref" onclick="">BPS 2025</a>)</span></li>
+<li>Data: NASA Black Marble <span class="citation" data-cites="blackmarblepy">(<a href="#/references" role="doc-biblioref" onclick="">Stefanini Vicente and Marty 2023</a>)</span>, BPS <span class="citation" data-cites="bps">(<a href="#/references" role="doc-biblioref" onclick="">BPS 2025</a>)</span></li>
 </ul>
 </div>
 <p>Contact: krisna@dewanekonomi.go.id</p>
 </section>
-<section id="section" class="slide level2 ending-slide smaller scrollable" data-background-image="end.png" data-background-size="cover">
-<h2></h2>
-
+<section id="references" class="slide level2 smaller scrollable">
+<h2>References</h2>
+<div class="smaller">
 <div id="refs" class="references csl-bib-body hanging-indent" role="list">
 <div id="ref-nl2" class="csl-entry" role="listitem">
 Bickenbach, Frank, Eckhardt Bode, Peter Nunnenkamp, and Mareike Söder. 2016. <span>“Night Lights and Regional GDP.”</span> Journal Article. <em>Review of World Economics</em> 152 (2): 425–447. https://doi.org/<a href="https://doi.org/10.1007/s10290-016-0246-0">https://doi.org/10.1007/s10290-016-0246-0</a>.
@@ -593,6 +605,11 @@ Martínez, Luis R. 2022. <span>“How Much Should We Trust the Dictator’s GDP 
 Stefanini Vicente, Gabriel, and Robert Marty. 2023. <em><span class="nocase">BlackMarblePy: Georeferenced Rasters and Statistics of Nighttime Lights from NASA Black Marble</span></em>. <a href="https://worldbank.github.io/blackmarblepy" class="uri">Https://worldbank.github.io/blackmarblepy</a>. <a href="https://doi.org/10.5281/zenodo.10667907">https://doi.org/10.5281/zenodo.10667907</a>.
 </div>
 </div>
+</div>
+</section>
+<section id="section" class="slide level2 ending-slide" data-background-image="end.png" data-background-size="cover">
+<h2></h2>
+
 </section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
